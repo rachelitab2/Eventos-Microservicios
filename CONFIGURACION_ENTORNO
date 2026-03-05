@@ -1,0 +1,22 @@
+CONFIGURACION DEL ENTORNO DE DESARROLLO 
+1.Instalar MySQL:
+Descargar MySQL Installer desde: https://dev.mysql.com/downloads/windows/installer/ 
+durante la instalacion seleccionar: Developer Default, o FUll 
+CONFIGURACION DEL SERVIDOR:
+usuario:root
+NO CREAR SOLO AÑADIR CONTRASEÑA*
+Password: root123
+ABRIR MYSQL WORKBENCH:
+-Local instance MYSQL80
+-COLOCAR PASSWORD:root123 
+Paso 5 - Crear las bases de datos locales de ustedes:
+create database auth_db;
+create database user_db;
+create database event_db;
+create database inscrip_db;
+create database notification_db; 
+
+CLONAR REPOSITORIO EN VS CODE 
+Abrir terminal seria algo asi: 
+git clone https://github.com/tu-repo <-- yo les enviare el link 
+nota* pueden decirle a chat que los ayude si no saben como moverse en VS CODE 
