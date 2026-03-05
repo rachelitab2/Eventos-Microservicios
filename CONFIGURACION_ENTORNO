@@ -20,3 +20,17 @@ CLONAR REPOSITORIO EN VS CODE
 Abrir terminal seria algo asi: 
 git clone https://github.com/tu-repo <-- yo les enviare el link 
 nota* pueden decirle a chat que los ayude si no saben como moverse en VS CODE 
+
+PUERTOS DE MICROSERVICIOS 
+auth_service -> 8081
+user-service-> 8082
+event-service -> 8083
+inscrip-service -> 8084 
+notification-service -> 8085 
+
+cada micro servicio tiene su propio puerto* 
+
+
+configuracion MYSQL EN SPRING 
+host:localhost 
+puerto:3306
