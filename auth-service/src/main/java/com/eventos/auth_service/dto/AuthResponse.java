@@ -1,5 +1,6 @@
 package com.eventos.auth_service.dto;
 
+// Esta clase devuelve la respuesta que ve el frontend al registrarse o iniciar sesion.
 public class AuthResponse {
 
     private String message;

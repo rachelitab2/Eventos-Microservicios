@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
+// Esta configuracion deja libres los endpoints de auth para poder probar register y login.
 public class SecurityConfig {
 
     @Bean
@@ -25,6 +26,7 @@ public class SecurityConfig {
     }
 
     @Bean
+    // Este bean cifra la contrasena antes de guardarla en la base de datos.
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }

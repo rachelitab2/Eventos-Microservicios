@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
+// Aqui va la logica principal del registro y del inicio de sesion.
 public class AuthService {
 
     private final UserRepository userRepository;
@@ -21,6 +22,7 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    // Este metodo registra el usuario y evita que se repita email o username.
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already exists");
@@ -39,6 +41,7 @@ public class AuthService {
         return new AuthResponse("User registered successfully", savedUser.getId(), savedUser.getUsername(), savedUser.getEmail());
     }
 
+    // Este metodo valida las credenciales y permite iniciar sesion si todo esta correcto.
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials"));

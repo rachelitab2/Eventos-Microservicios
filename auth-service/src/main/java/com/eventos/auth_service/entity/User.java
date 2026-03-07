@@ -8,6 +8,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "users")
+// Esta clase representa la tabla users para guardar los datos basicos de autenticacion.
 public class User {
 
     @Id

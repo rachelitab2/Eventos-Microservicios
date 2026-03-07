@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+// Este dto recibe los datos que llegan cuando el usuario se registra.
 public class RegisterRequest {
 
     @NotBlank(message = "Username is required")

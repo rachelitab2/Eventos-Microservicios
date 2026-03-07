@@ -3,6 +3,7 @@ package com.eventos.auth_service.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
+// Este dto recibe los datos del login.
 public class LoginRequest {
 
     @Email(message = "Email must be valid")
