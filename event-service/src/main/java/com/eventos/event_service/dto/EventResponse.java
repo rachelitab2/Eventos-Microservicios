@@ -1,82 +1,34 @@
-package com.eventos.event_service.entity;
+package com.eventos.event_service.dto;
 
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "events")
-public class Event {
+public class EventResponse {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false, length = 150)
     private String name;
-
-    @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
-
-    @Column(nullable = false, length = 200)
     private String location;
-
-    @Column(nullable = false)
     private LocalDateTime eventDate;
-
-    @Column(nullable = false)
     private Integer totalCapacity;
-
-    @Column(nullable = false)
     private Integer availableSpots;
-
-    @Column(nullable = false, length = 80)
     private String category;
-
-    @Column(nullable = false)
     private Double price;
-
-    @Column(length = 500)
     private String imageUrl;
-
-    @Column(length = 300)
     private String instagramUrl;
-
-    @Column(length = 100)
     private String instagramUser;
-
-    @Column(length = 300)
     private String facebookUrl;
-
-    @Column(length = 100)
     private String facebookUser;
-
-    @Column(length = 20)
     private String whatsappNumber;
-
-    @Column(length = 300)
     private String tiktokUrl;
-
-    @Column(length = 100)
     private String tiktokUser;
-
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(nullable = false)
     private boolean active;
+    private LocalDateTime createdAt;
+    private String status;
 
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.active = true;
-        if (this.availableSpots == null) {
-            this.availableSpots = this.totalCapacity;
-        }
-    }
-
-    public Event() {}
+    public EventResponse() {}
 
     public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -126,8 +78,12 @@ public class Event {
     public String getTiktokUser() { return tiktokUser; }
     public void setTiktokUser(String tiktokUser) { this.tiktokUser = tiktokUser; }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }
