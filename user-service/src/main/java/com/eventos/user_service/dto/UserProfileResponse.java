@@ -1,19 +1,14 @@
-package com.eventos.user_service.entity;
+package com.eventos.user_service.dto;
 
-import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "user_profiles")
-public class UserProfile {
+//representa los datos que salen del servicio
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class UserProfileResponse {
+
     private Long id;
-
     private Long authUserId;
-
     private String nombre;
     private String apellido;
     private String telefono;
@@ -21,24 +16,13 @@ public class UserProfile {
     private String genero;
     private LocalDate fechaNacimiento;
     private String fotoPerfil;
-
     private LocalDateTime fechaCreacion;
     private LocalDateTime fechaActualizacion;
 
-    @PrePersist
-    protected void onCreate() {
-        fechaCreacion = LocalDateTime.now();
-        fechaActualizacion = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        fechaActualizacion = LocalDateTime.now();
-    }
-
-    public UserProfile() {}
+    public UserProfileResponse() {}
 
     public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
     public Long getAuthUserId() { return authUserId; }
     public void setAuthUserId(Long authUserId) { this.authUserId = authUserId; }
@@ -65,5 +49,8 @@ public class UserProfile {
     public void setFotoPerfil(String fotoPerfil) { this.fotoPerfil = fotoPerfil; }
 
     public LocalDateTime getFechaCreacion() { return fechaCreacion; }
+    public void setFechaCreacion(LocalDateTime fechaCreacion) { this.fechaCreacion = fechaCreacion; }
+
     public LocalDateTime getFechaActualizacion() { return fechaActualizacion; }
+    public void setFechaActualizacion(LocalDateTime fechaActualizacion) { this.fechaActualizacion = fechaActualizacion; }
 }
