@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pura Vida PC | Mis Eventos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Navbar moderno e integrado -->
+  <header class="site-header">
+    <div class="container">
+      <div class="site-nav nav-shell">
+        <a href="index.html" class="brand">
+          <span class="brand-mark">
+     <svg viewBox="0 0 70 70" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="35" cy="35" r="33" fill="#4B9DA9"/>
+      <circle cx="35" cy="35" r="30" fill="none" stroke="#91C6BC" stroke-width="0.8" opacity="0.5"/>
+      <g transform="translate(35, 35)">
+        <ellipse cx="0" cy="-15" rx="8" ry="14" fill="#E37434" opacity="0.95" transform="rotate(0)"/>
+        <ellipse cx="0" cy="-15" rx="8" ry="14" fill="#E37434" opacity="0.9" transform="rotate(72)"/>
+        <ellipse cx="0" cy="-15" rx="8" ry="14" fill="#E37434" opacity="0.9" transform="rotate(144)"/>
+        <ellipse cx="0" cy="-15" rx="8" ry="14" fill="#E37434" opacity="0.9" transform="rotate(216)"/>
+        <ellipse cx="0" cy="-15" rx="8" ry="14" fill="#E37434" opacity="0.9" transform="rotate(288)"/>
+        <ellipse cx="0" cy="-12" rx="5" ry="10" fill="#F6F3C2" opacity="0.35" transform="rotate(36)"/>
+        <ellipse cx="0" cy="-12" rx="5" ry="10" fill="#F6F3C2" opacity="0.35" transform="rotate(108)"/>
+        <ellipse cx="0" cy="-12" rx="5" ry="10" fill="#F6F3C2" opacity="0.35" transform="rotate(180)"/>
+        <ellipse cx="0" cy="-12" rx="5" ry="10" fill="#F6F3C2" opacity="0.35" transform="rotate(252)"/>
+        <ellipse cx="0" cy="-12" rx="5" ry="10" fill="#F6F3C2" opacity="0.35" transform="rotate(324)"/>
+        <circle cx="0" cy="0" r="7" fill="#F6F3C2"/>
+        <circle cx="0" cy="0" r="5" fill="#E37434"/>
+        <circle cx="0" cy="0" r="2.5" fill="#4B9DA9"/>
+      </g>
+    </svg>
+          </span>
+          <span class="brand-text">
+            <strong>Pura Vida</strong>
+            <small>Punta Cana</small>
+          </span>
+        </a>
+
+        <nav class="nav-links">
+          <a href="index.html">Inicio</a>
+          <a href="events.html">Eventos</a>
+          <a href="my-events.html" style="color: var(--color-white); font-weight: 600;">Mis Eventos</a>
+        </nav>
+
+        <div class="nav-actions" id="userNavActions">
+          <a href="auth.html" class="nav-login" id="loginLink">Iniciar sesion</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenido Principal -->
+  <main class="events-page" style="padding-top: 150px;">
+    <div class="container">
+      
+      <div style="text-align: center; margin-bottom: 50px;">
+        <h1 class="detail-title">Mis Experiencias Reservadas</h1>
+        <p style="color: var(--color-muted); font-size: 1.1rem;">Aquí puedes ver todos los eventos en los que estás inscrito.</p>
+      </div>
+
+      <!-- Usaremos la misma grilla V3 hermosa de los eventos -->
+      <div class="events-grid-v3" id="myEventsGrid"></div>
+      
+      <!-- Mensaje cuando está cargando o vacío -->
+      <div id="myEventsMessage" style="text-align: center; padding: 60px; background: var(--color-white); border-radius: 20px; box-shadow: var(--shadow-soft);">
+        <h3>Cargando tus eventos...</h3>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="app.js?v=3"></script>
+</body>
+</html>
