@@ -1,42 +1,44 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pura Vida PC | Eventos</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-    rel="stylesheet"
-  >
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="animations.css">
 </head>
+
 <body>
+  <div class="scroll-progress" id="scrollProgress"></div>
   <header class="site-header">
     <div class="container">
       <div class="site-nav nav-shell">
         <a href="index.html" class="brand">
           <span class="brand-mark">
-                       <svg viewBox="0 0 70 70" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="35" cy="35" r="33" fill="#4B9DA9"/>
-      <circle cx="35" cy="35" r="30" fill="none" stroke="#91C6BC" stroke-width="0.8" opacity="0.5"/>
-      <g transform="translate(35, 35)">
-        <ellipse cx="0" cy="-15" rx="8" ry="14" fill="#E37434" opacity="0.95" transform="rotate(0)"/>
-        <ellipse cx="0" cy="-15" rx="8" ry="14" fill="#E37434" opacity="0.9" transform="rotate(72)"/>
-        <ellipse cx="0" cy="-15" rx="8" ry="14" fill="#E37434" opacity="0.9" transform="rotate(144)"/>
-        <ellipse cx="0" cy="-15" rx="8" ry="14" fill="#E37434" opacity="0.9" transform="rotate(216)"/>
-        <ellipse cx="0" cy="-15" rx="8" ry="14" fill="#E37434" opacity="0.9" transform="rotate(288)"/>
-        <ellipse cx="0" cy="-12" rx="5" ry="10" fill="#F6F3C2" opacity="0.35" transform="rotate(36)"/>
-        <ellipse cx="0" cy="-12" rx="5" ry="10" fill="#F6F3C2" opacity="0.35" transform="rotate(108)"/>
-        <ellipse cx="0" cy="-12" rx="5" ry="10" fill="#F6F3C2" opacity="0.35" transform="rotate(180)"/>
-        <ellipse cx="0" cy="-12" rx="5" ry="10" fill="#F6F3C2" opacity="0.35" transform="rotate(252)"/>
-        <ellipse cx="0" cy="-12" rx="5" ry="10" fill="#F6F3C2" opacity="0.35" transform="rotate(324)"/>
-        <circle cx="0" cy="0" r="7" fill="#F6F3C2"/>
-        <circle cx="0" cy="0" r="5" fill="#E37434"/>
-        <circle cx="0" cy="0" r="2.5" fill="#4B9DA9"/>
-      </g>
-    </svg>
+            <svg viewBox="0 0 70 70" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="35" cy="35" r="33" fill="#4B9DA9" />
+              <circle cx="35" cy="35" r="30" fill="none" stroke="#91C6BC" stroke-width="0.8" opacity="0.5" />
+              <g transform="translate(35, 35)">
+                <ellipse cx="0" cy="-15" rx="8" ry="14" fill="#E37434" opacity="0.95" transform="rotate(0)" />
+                <ellipse cx="0" cy="-15" rx="8" ry="14" fill="#E37434" opacity="0.9" transform="rotate(72)" />
+                <ellipse cx="0" cy="-15" rx="8" ry="14" fill="#E37434" opacity="0.9" transform="rotate(144)" />
+                <ellipse cx="0" cy="-15" rx="8" ry="14" fill="#E37434" opacity="0.9" transform="rotate(216)" />
+                <ellipse cx="0" cy="-15" rx="8" ry="14" fill="#E37434" opacity="0.9" transform="rotate(288)" />
+                <ellipse cx="0" cy="-12" rx="5" ry="10" fill="#F6F3C2" opacity="0.35" transform="rotate(36)" />
+                <ellipse cx="0" cy="-12" rx="5" ry="10" fill="#F6F3C2" opacity="0.35" transform="rotate(108)" />
+                <ellipse cx="0" cy="-12" rx="5" ry="10" fill="#F6F3C2" opacity="0.35" transform="rotate(180)" />
+                <ellipse cx="0" cy="-12" rx="5" ry="10" fill="#F6F3C2" opacity="0.35" transform="rotate(252)" />
+                <ellipse cx="0" cy="-12" rx="5" ry="10" fill="#F6F3C2" opacity="0.35" transform="rotate(324)" />
+                <circle cx="0" cy="0" r="7" fill="#F6F3C2" />
+                <circle cx="0" cy="0" r="5" fill="#E37434" />
+                <circle cx="0" cy="0" r="2.5" fill="#4B9DA9" />
+              </g>
+            </svg>
 
           </span>
 
@@ -59,17 +61,18 @@
     </div>
   </header>
 
-     <main class="events-page">
+  <main class="events-page">
     <!-- Hero Section caribeño -->
     <section class="events-hero">
       <div class="container">
-        <h1>Eventos en Punta Cana</h1>
-        <p>Descubre las mejores experiencias y actividades que nuestra paraíso caribeño tiene para ofrecer</p>
+        <h1 data-aos="fade-up" data-aos-duration="700">Eventos en Punta Cana</h1>
+        <p data-aos="fade-up" data-aos-delay="200" data-aos-duration="700">Descubre las mejores experiencias y
+          actividades que nuestro paraíso caribeño tiene para ofrecer</p>
       </div>
     </section>
 
     <div class="container">
-      
+
       <!-- Este es el diseño de los filtros en píldora bicolor (Turquesa/Naranja) de la imagen 3 -->
       <div class="filters-container-v3">
         <div class="filters-pill-v3">
@@ -78,7 +81,7 @@
             <button class="dropdown-button" type="button">
               <span class="dropdown-text">Category</span>
               <svg class="dropdown-arrow" viewBox="0 0 24 24">
-                <path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none"/>
+                <path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none" />
               </svg>
             </button>
             <div class="dropdown-menu">
@@ -94,7 +97,7 @@
             <button class="dropdown-button" type="button">
               <span class="dropdown-text">Date</span>
               <svg class="dropdown-arrow" viewBox="0 0 24 24">
-                <path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none"/>
+                <path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none" />
               </svg>
             </button>
             <div class="dropdown-menu">
@@ -107,15 +110,41 @@
         </div>
       </div>
 
-      <!-- Aquí es donde app.js inyectará las nuevas tarjetas -->
+      <!-- app.js inyecta las tarjetas aquí -->
       <div class="events-grid-v3" id="eventsGrid"></div>
       <p class="events-message" id="eventsMessage">Cargando eventos...</p>
 
     </div>
   </main>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  <script src="app.js"></script>
+  <script>
+    AOS.init({ once: true, offset: 60, easing: 'cubic-bezier(0.22,1,0.36,1)' });
+    const prog = document.getElementById('scrollProgress');
+    const header = document.querySelector('.site-header');
+    let lastScroll = 0;
+    window.addEventListener('scroll', () => {
+      const cur = window.scrollY;
+      if (prog) prog.style.width = (cur / (document.body.scrollHeight - window.innerHeight)) * 100 + '%';
+      if (header) {
+        header.classList.toggle('scrolled', cur > 60);
+        header.classList.toggle('hidden', cur > lastScroll && cur > 200);
+      }
+      lastScroll = cur <= 0 ? 0 : cur;
+    }, { passive: true });
 
-
-  <script src="app.js?v=2"></script>
+    // Animate event cards injected by app.js
+    const observer = new MutationObserver(() => {
+      document.querySelectorAll('#eventsGrid .event-card-v3:not([data-aos])').forEach((card, i) => {
+        card.setAttribute('data-aos', 'zoom-in-card');
+        card.setAttribute('data-aos-delay', String(i * 80));
+        card.setAttribute('data-aos-duration', '600');
+      });
+      AOS.refresh();
+    });
+    observer.observe(document.getElementById('eventsGrid'), { childList: true });
+  </script>
 </body>
+
 </html>

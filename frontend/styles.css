@@ -1,12 +1,16 @@
 ﻿:root {
-  --color-primary: #4B9DA9; /* Turquesa Oscuro */
-  --color-secondary: #91C6BC; /* Turquesa Claro */
-  --color-cream: #F6F3C2; /* Crema */
-  --color-accent: #E37434; /* Naranja */
+  --color-primary: #4B9DA9;
+  /* Turquesa Oscuro */
+  --color-secondary: #91C6BC;
+  /* Turquesa Claro */
+  --color-cream: #F6F3C2;
+  /* Crema */
+  --color-accent: #E37434;
+  /* Naranja */
   --color-white: #ffffff;
   --color-dark: #2c3638;
   --color-muted: #6b7a7c;
-  
+
   /* Sombras y bordes sÃºper redondos como en tu mockup */
   --shadow-soft: 0 8px 32px rgba(75, 157, 169, 0.15);
   --shadow-card: 0 12px 24px rgba(0, 0, 0, 0.06);
@@ -36,7 +40,7 @@ body {
   line-height: 1.6;
   /* Sutil patrÃ³n para darle textura y que no se vea plano */
   background-image: radial-gradient(circle at 100% 0%, rgba(145, 198, 188, 0.15) 0%, transparent 40%),
-                    radial-gradient(circle at 0% 100%, rgba(227, 116, 52, 0.08) 0%, transparent 40%);
+    radial-gradient(circle at 0% 100%, rgba(227, 116, 52, 0.08) 0%, transparent 40%);
   background-attachment: fixed;
 }
 
@@ -82,13 +86,17 @@ button {
   align-items: center;
   justify-content: center;
   min-width: 170px;
-  padding: 14px 24px;
+  padding: 14px 28px;
   border-radius: 999px;
   background: var(--color-accent);
   color: var(--color-white);
   font-weight: 600;
   box-shadow: 0 12px 24px rgba(227, 116, 52, 0.28);
-  transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.3s ease,
+    opacity 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .btn:hover {
@@ -145,7 +153,7 @@ button {
   display: flex;
   align-items: center;
   background-attachment: fixed;
-  background-image: 
+  background-image:
     linear-gradient(rgba(44, 54, 56, 0.75), rgba(44, 54, 56, 0.65)),
     url("https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=1600&q=80");
   background-size: cover;
@@ -321,7 +329,8 @@ button {
 .nav-shell {
   background: var(--color-primary);
   border-radius: 999px;
-  padding: 10px 40px 10px 15px; /* MÃ¡s padding a la derecha, menos a la izq por el logo */
+  padding: 10px 40px 10px 15px;
+  /* MÃ¡s padding a la derecha, menos a la izq por el logo */
   box-shadow: var(--shadow-soft);
 }
 
@@ -635,11 +644,13 @@ button {
 }
 
 @media (max-width: 900px) {
+
   .about-deco-left,
   .about-deco-right {
     opacity: 0.1;
   }
 }
+
 .about-illustration {
   position: absolute;
   z-index: 1;
@@ -830,11 +841,13 @@ button {
 }
 
 @media (max-width: 900px) {
+
   .about-deco-left,
   .about-deco-right {
     opacity: 0.1;
   }
 }
+
 .about-illustration {
   position: absolute;
   z-index: 1;
@@ -939,8 +952,7 @@ button {
   justify-content: flex-start;
   background:
     linear-gradient(rgba(18, 91, 100, 0.28), rgba(18, 91, 100, 0.18)),
-    url("https://images.unsplash.com/photo-1707190171777-16b317518290?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")
-    center/cover no-repeat;
+    url("https://images.unsplash.com/photo-1707190171777-16b317518290?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D") center/cover no-repeat;
   color: var(--color-white);
   overflow: hidden;
 }
@@ -1231,7 +1243,7 @@ button {
 
 .events-page {
   min-height: 100vh;
-  background: 
+  background:
     radial-gradient(circle at 20% 30%, rgba(75, 157, 169, 0.12) 0%, transparent 50%),
     radial-gradient(circle at 80% 70%, rgba(227, 116, 52, 0.08) 0%, transparent 50%),
     linear-gradient(135deg, #f8f6dc 0%, #f6f3c2 100%);
@@ -1240,7 +1252,7 @@ button {
 /* Hero Section para eventos */
 .events-hero {
   height: 300px;
-  background: 
+  background:
     linear-gradient(rgba(44, 54, 56, 0.7), rgba(44, 54, 56, 0.5)),
     url("https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1600&q=80") center/cover;
   background-attachment: fixed;
@@ -1287,7 +1299,8 @@ button {
 .filters-container-v3 {
   display: flex;
   justify-content: center;
-  margin-top: 40px; /* Reducido porque ahora tenemos hero */
+  margin-top: 40px;
+  /* Reducido porque ahora tenemos hero */
   margin-bottom: 50px;
 }
 
@@ -1298,7 +1311,7 @@ button {
   border-radius: 999px;
   padding: 8px 10px;
   gap: 12px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
 }
 
 .filter-select-v3 {
@@ -1319,7 +1332,7 @@ button {
   background-position: right 20px center;
   background-size: 16px;
   transition: transform 0.2s ease;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
 .filter-select-v3:hover {
@@ -1328,7 +1341,7 @@ button {
 
 .filter-date-v3 {
   /* Al ser ligeramente transparente, deja ver el tono naranja del fondo */
-  background-color: rgba(246, 243, 194, 0.95); 
+  background-color: rgba(246, 243, 194, 0.95);
 }
 
 /* Grilla de eventos estilo imagen 3 */
@@ -1343,7 +1356,7 @@ button {
   background: var(--color-cream);
   border-radius: 24px;
   overflow: hidden;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -1404,7 +1417,8 @@ button {
   margin-top: auto;
   padding-top: 20px;
   display: flex;
-  justify-content: center; /* Centra el botÃ³n exactamente como en tu diseÃ±o */
+  justify-content: center;
+  /* Centra el botÃ³n exactamente como en tu diseÃ±o */
 }
 
 /* El botÃ³n oscuro turquesa */
@@ -1423,6 +1437,7 @@ button {
   transform: scale(1.05);
   background: var(--color-dark);
 }
+
 /* Dropdown Personalizado Estilo Imagen */
 .custom-dropdown {
   position: relative;
@@ -1512,7 +1527,7 @@ button {
   background: #f6f3c2;
   border-radius: 30px;
   padding: 50px 40px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
   border: 3px solid #4B9DA9;
   max-width: 600px;
   width: 100%;
@@ -1526,7 +1541,7 @@ button {
   left: 0;
   right: 0;
   bottom: 0;
-  background: 
+  background:
     radial-gradient(circle at 10% 20%, rgba(75, 157, 169, 0.1) 0%, transparent 30%),
     radial-gradient(circle at 90% 80%, rgba(227, 116, 52, 0.08) 0%, transparent 30%);
   pointer-events: none;
@@ -1642,17 +1657,17 @@ button {
   .form-row {
     grid-template-columns: 1fr;
   }
-  
+
   .profile-card {
     padding: 40px 30px;
     margin: 0 20px;
   }
-  
+
   .submit-row {
     flex-direction: column;
     align-items: center;
   }
-  
+
   .profile-submit-btn,
   .profile-logout-btn {
     width: 100%;
@@ -1686,8 +1701,12 @@ button {
 
 .image-accent-border {
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-color: var(--color-primary); /* Marco azul del mock */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--color-primary);
+  /* Marco azul del mock */
   border-radius: 40px;
   transform: translate(-15px, -15px);
   z-index: -1;
@@ -1698,7 +1717,7 @@ button {
   height: 100%;
   object-fit: cover;
   border-radius: 30px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
 /* Panel Derecho con las Tarjetas Flotantes */
@@ -1710,11 +1729,12 @@ button {
 
 .detail-floating-card {
   background: var(--color-cream);
-  border: 4px solid var(--color-primary); /* Borde azul-verde perimetral */
+  border: 4px solid var(--color-primary);
+  /* Borde azul-verde perimetral */
   border-radius: 30px;
   padding: 40px 35px;
   text-align: center;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
   position: relative;
 }
 
@@ -1768,18 +1788,26 @@ button {
 .btn-ripple-effect {
   position: absolute;
   top: 50%;
-  right: 15px; /* Simula la ondulación a la derecha del boton del mockup */
+  right: 15px;
+  /* Simula la ondulación a la derecha del boton del mockup */
   transform: translateY(-50%);
   width: 25px;
   height: 25px;
   border-radius: 50%;
-  border: 4px solid rgba(255,255,255,0.4);
+  border: 4px solid rgba(255, 255, 255, 0.4);
   animation: radarPulse 2s infinite ease-out;
 }
 
 @keyframes radarPulse {
-  0% { transform: translateY(-50%) scale(0.5); opacity: 1; }
-  100% { transform: translateY(-50%) scale(2.5); opacity: 0; }
+  0% {
+    transform: translateY(-50%) scale(0.5);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(-50%) scale(2.5);
+    opacity: 0;
+  }
 }
 
 /* Tarjeta del Mapa Inferior */
@@ -1809,5 +1837,3 @@ button {
   color: #333;
   font-size: 1.1rem;
 }
-
-
