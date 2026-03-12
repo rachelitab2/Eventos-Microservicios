@@ -46,7 +46,7 @@ public class UserProfileService {
     // Consultar perfil por authUserId (id que viene de auth-service)
     public UserProfileResponse obtenerPorAuthUserId(Long authUserId) {
         UserProfile perfil = userProfileRepository.findByAuthUserId(authUserId)
-                .orElseThrow(() -> new RuntimeException("Perfil no encontrado para el usuario: " + authUserId));
+                .orElseGet(() -> userProfileRepository.save(crearPerfilVacio(authUserId)));
         return convertirAResponse(perfil);
     }
 
@@ -65,6 +65,12 @@ public class UserProfileService {
 
         UserProfile actualizado = userProfileRepository.save(perfil);
         return convertirAResponse(actualizado);
+    }
+
+    private UserProfile crearPerfilVacio(Long authUserId) {
+        UserProfile perfil = new UserProfile();
+        perfil.setAuthUserId(authUserId);
+        return perfil;
     }
 
     // O - Open/Closed: si mañana cambian los campos del response, solo tocamos este método
