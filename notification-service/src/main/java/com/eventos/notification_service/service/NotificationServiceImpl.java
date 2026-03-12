@@ -5,41 +5,40 @@ import com.eventos.notification_service.dto.NotificationResponse;
 import com.eventos.notification_service.email.EmailSender;
 import com.eventos.notification_service.entity.Notification;
 import com.eventos.notification_service.repository.NotificationRepository;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
 /**
- * Implementación del servicio de notificaciones.
- * Orquesta el guardado en base de datos y el envío del correo,
- * pero delega cada responsabilidad a su clase correspondiente.
- *
- * Principio SOLID aplicado:
- * - SRP: esta clase solo orquesta el flujo de notificaciones,
- *   no implementa el envío de correo ni el acceso a datos directamente.
- * - DIP: depende de abstracciones (NotificationRepository, EmailSender)
- *   inyectadas por constructor con Lombok.
+ * Implementacion del servicio de notificaciones.
+ * Orquesta el guardado en base de datos y delega el correo
+ * a un ejecutor dedicado para no bloquear la respuesta HTTP.
  */
 @Service
-@RequiredArgsConstructor
+@Slf4j
 public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final EmailSender emailSender;
+    private final Executor mailTaskExecutor;
 
-    /**
-     * Crea una notificación, la persiste en la base de datos
-     * y envía el correo de confirmación al usuario.
-     *
-     * @param request datos de la notificación enviados por el frontend
-     * @return respuesta con los datos de la notificación creada
-     */
+    public NotificationServiceImpl(
+            NotificationRepository notificationRepository,
+            EmailSender emailSender,
+            @Qualifier("mailTaskExecutor") Executor mailTaskExecutor
+    ) {
+        this.notificationRepository = notificationRepository;
+        this.emailSender = emailSender;
+        this.mailTaskExecutor = mailTaskExecutor;
+    }
+
     @Override
     public NotificationResponse crearNotificacion(NotificationRequest request) {
-
-        // Construimos la entidad con los datos del request
         Notification notification = Notification.builder()
                 .userId(request.getUserId())
                 .email(request.getEmail())
@@ -49,28 +48,17 @@ public class NotificationServiceImpl implements NotificationService {
                 .sentAt(LocalDateTime.now())
                 .build();
 
-        // Guardamos la notificación en la base de datos
+        long startDb = System.currentTimeMillis();
         Notification guardada = notificationRepository.save(notification);
+        log.info("Notificacion guardada en DB. Tiempo: {}ms", System.currentTimeMillis() - startDb);
 
-        // Enviamos el correo de confirmación si hay email disponible
-        if (request.getEmail() != null && !request.getEmail().isEmpty()) {
-            emailSender.enviarConfirmacion(
-                    request.getEmail(),
-                    request.getEventName(),
-                    request.getMessage()
-            );
+        if (request.getEmail() != null && !request.getEmail().isBlank()) {
+            programarCorreo(request.getEmail(), request.getEventName(), request.getMessage());
         }
 
-        // Retornamos la respuesta con los datos guardados
         return mapearRespuesta(guardada);
     }
 
-    /**
-     * Obtiene todas las notificaciones de un usuario específico.
-     *
-     * @param userId ID del usuario
-     * @return lista de notificaciones del usuario
-     */
     @Override
     public List<NotificationResponse> obtenerPorUsuario(Long userId) {
         return notificationRepository.findByUserId(userId)
@@ -79,13 +67,15 @@ public class NotificationServiceImpl implements NotificationService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Convierte una entidad Notification en un NotificationResponse.
-     * Método privado de mapeo para mantener el código limpio.
-     *
-     * @param notification entidad a convertir
-     * @return DTO de respuesta
-     */
+    private void programarCorreo(String email, String eventName, String message) {
+        try {
+            mailTaskExecutor.execute(() -> emailSender.enviarConfirmacion(email, eventName, message));
+            log.info("Envio de correo programado para {}", email);
+        } catch (Exception e) {
+            log.error("No se pudo programar el correo para {}", email, e);
+        }
+    }
+
     private NotificationResponse mapearRespuesta(Notification notification) {
         return NotificationResponse.builder()
                 .id(notification.getId())
