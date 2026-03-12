@@ -7,6 +7,7 @@ import com.eventos.event_service.entity.Event;
 import com.eventos.event_service.exception.EventNotFoundException;
 import com.eventos.event_service.repository.EventRepository;
 import org.springframework.stereotype.Service;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +31,10 @@ public class EventServiceImpl implements EventService {
     // Registra un nuevo evento en la base de datos
     @Override
     public EventResponse createEvent(EventRequest request) {
+        // Validación de fecha pasada
+        if (request.getEventDate() != null && request.getEventDate().isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("La fecha del evento debe ser en el futuro, no puede ser una fecha pasada");
+        }
         Event event = eventMapper.toEntity(request);
         Event savedEvent = eventRepository.save(event);
         return eventMapper.toResponse(savedEvent);
