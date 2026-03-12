@@ -5,6 +5,7 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 /**
@@ -18,10 +19,15 @@ import org.springframework.stereotype.Component;
  *   no de una implementación concreta de correo.
  */
 @Component
-@RequiredArgsConstructor
 public class EmailSender {
 
     private final JavaMailSender mailSender;
+    private final String fromEmail;
+
+    public EmailSender(JavaMailSender mailSender, @org.springframework.beans.factory.annotation.Value("${spring.mail.username}") String fromEmail) {
+        this.mailSender = mailSender;
+        this.fromEmail = fromEmail;
+    }
 
     /**
      * Envía un correo HTML al usuario con la confirmación de inscripción.
@@ -30,13 +36,14 @@ public class EmailSender {
      * @param eventName    nombre del evento
      * @param message      mensaje de confirmación
      */
+    @Async
     public void enviarConfirmacion(String destinatario, String eventName, String message) {
         try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
             // Configuración del correo
-            helper.setFrom("EventosPuraVidaPC@gmail.com", "Pura Vida PC");
+            helper.setFrom(fromEmail, "Pura Vida PC");
             helper.setTo(destinatario);
             helper.setSubject("¡Inscripción confirmada! - " + eventName);
             helper.setText(construirCuerpo(eventName, message), true);

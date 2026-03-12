@@ -43,7 +43,12 @@
           </span>
         </a>
 
-        <!-- app.js llena esto con el nombre real del usuario -->
+        <nav class="nav-links">
+          <a href="index.html">Inicio</a>
+          <a href="events.html">Eventos</a>
+          <a href="my-events.html">Mis Eventos</a>
+        </nav>
+
         <div class="nav-actions" id="userNavActions"></div>
 
       </div>
@@ -69,14 +74,6 @@
 
       <h2 style="text-align:center; margin-bottom:10px; color:#333;">Mis Eventos</h2>
       <p style="text-align:center; color:var(--color-muted); margin-bottom:20px;">Aquí puedes ver todos los eventos en los que te has inscrito.</p>
-
-      <!-- Filtros por estado -->
-      <div id="myEventsFilters" style="display:none; justify-content:center; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
-        <button class="my-filter-pill active" onclick="filtrarMisEventos('ALL', this)">Todos <span id="cntAll">0</span></button>
-        <button class="my-filter-pill" onclick="filtrarMisEventos('CONFIRMED', this)">✅ Confirmados <span id="cntConfirmed">0</span></button>
-        <button class="my-filter-pill" onclick="filtrarMisEventos('PENDING', this)">⏳ Pendientes <span id="cntPending">0</span></button>
-        <button class="my-filter-pill" onclick="filtrarMisEventos('CANCELLED', this)">❌ Cancelados <span id="cntCancelled">0</span></button>
-      </div>
 
       <!-- Grid de eventos inscritos -->
       <div id="myEventsGrid" style="display:none; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px;"></div>

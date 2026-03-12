@@ -7,6 +7,9 @@
 // ── URL del API (Producción Railway) ──
 const API_BASE = "https://gateway-production-69b3.up.railway.app";
 
+// ── AbortController para cancelar inscripción en curso ──
+let inscriptionController = null;
+
 // ── Helpers de sesión (todos en localStorage para persistencia) ──
 function saveSession(data) {
   localStorage.setItem("authUserId", data.userId || data.id);
@@ -23,6 +26,7 @@ function getSession() {
 }
 
 function logout() {
+  if (!confirm("¿Estás seguro de que deseas cerrar sesión?")) return;
   localStorage.clear();
   window.location.href = "index.html";
 }
@@ -78,8 +82,9 @@ function updateNavbar() {
         👤 Hola, ${username || "Usuario"}
       </a>
       <a href="#" onclick="logout();return false;"
-         style="margin-left:10px;font-size:13px;
-                color:var(--color-muted);text-decoration:none;">
+         style="margin-left:10px;font-size:13px;padding:6px 14px;
+                background:var(--color-accent);color:white;border-radius:999px;
+                text-decoration:none;font-weight:500;">
         Salir
       </a>
     `;
@@ -94,7 +99,26 @@ function updateNavbar() {
 // ── Lógica de Notificaciones ──
 window.toggleNotifications = function() {
   const d = document.getElementById("notifDropdown");
-  if(d) d.style.display = d.style.display === "none" ? "block" : "none";
+  const badge = document.getElementById("notifBadge");
+  if (d) {
+    const isOpening = d.style.display === "none";
+    d.style.display = isOpening ? "block" : "none";
+    if (isOpening && badge) {
+      badge.style.display = "none";
+      // Guardar que ya vio todas las notificaciones actuales
+      const { userId } = getSession();
+      if (userId) localStorage.setItem(`notifSeen_${userId}`, Date.now().toString());
+    }
+  }
+};
+
+window.clearAllNotifications = function() {
+  const notifList = document.getElementById("notifList");
+  const badge = document.getElementById("notifBadge");
+  const { userId } = getSession();
+  if (notifList) notifList.innerHTML = "<p style='text-align:center;color:#aaa;'>No hay notificaciones</p>";
+  if (badge) badge.style.display = "none";
+  if (userId) localStorage.setItem(`notifSeen_${userId}`, Date.now().toString());
 };
 
 window.loadNotifications = async function(userId) {
@@ -103,17 +127,26 @@ window.loadNotifications = async function(userId) {
     const data = await readResponseData(response);
     const notifList = document.getElementById("notifList");
     const badge = document.getElementById("notifBadge");
-    
+
     if (!response.ok || !Array.isArray(data)) {
       if(notifList) notifList.innerHTML = "No se pudieron cargar";
       return;
     }
-    
+
     if (data.length === 0) {
-      if(notifList) notifList.innerHTML = "No hay notificaciones";
+      if(notifList) notifList.innerHTML = "<p style='text-align:center;color:#aaa;'>No hay notificaciones</p>";
       if(badge) badge.style.display = "none";
     } else {
-      if(badge) { badge.textContent = data.length; badge.style.display = "flex"; }
+      // Verificar cuántas notificaciones son nuevas desde la última vez que abrió
+      const lastSeen = parseInt(localStorage.getItem(`notifSeen_${userId}`) || "0");
+      const newCount = data.filter(n => new Date(n.sentAt).getTime() > lastSeen).length;
+      if (newCount > 0 && badge) {
+        badge.textContent = newCount;
+        badge.style.display = "flex";
+      } else if (badge) {
+        badge.style.display = "none";
+      }
+
       if(notifList) {
         notifList.innerHTML = data.reverse().map(n => `
           <div style="padding:10px; border-bottom:1px solid #f9f9f9;">
@@ -121,10 +154,14 @@ window.loadNotifications = async function(userId) {
             ${n.message}<br/>
             <small style="color:#aaa">${new Date(n.sentAt).toLocaleString()}</small>
           </div>
-        `).join("");
+        `).join("") + `
+          <button onclick="clearAllNotifications()" style="width:100%;margin-top:8px;padding:8px;background:var(--color-accent);color:white;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;">
+            Borrar todas
+          </button>
+        `;
       }
     }
-  } catch(e) { 
+  } catch(e) {
     const notifList = document.getElementById("notifList");
     if(notifList) notifList.innerHTML = "Error al conectar con notificaciones";
   }
@@ -347,20 +384,20 @@ function setupFilters() {
   const dateItems = dateDropdown.querySelectorAll(".dropdown-item");
 
   const closeDropdowns = () => {
-    catDropdown.classList.remove("open");
-    dateDropdown.classList.remove("open");
+    catDropdown.classList.remove("active");
+    dateDropdown.classList.remove("active");
   };
 
   catBtn.addEventListener("click", (e) => {
     e.stopPropagation();
-    dateDropdown.classList.remove("open");
-    catDropdown.classList.toggle("open");
+    dateDropdown.classList.remove("active");
+    catDropdown.classList.toggle("active");
   });
 
   dateBtn.addEventListener("click", (e) => {
     e.stopPropagation();
-    catDropdown.classList.remove("open");
-    dateDropdown.classList.toggle("open");
+    catDropdown.classList.remove("active");
+    dateDropdown.classList.toggle("active");
   });
 
   document.addEventListener("click", closeDropdowns);
@@ -425,11 +462,17 @@ window.abrirModalConfirmacion = function () {
 };
 
 window.cerrarModalConfirmacion = function () {
+  if (inscriptionController) {
+    inscriptionController.abort();
+    inscriptionController = null;
+  }
   const modal = document.getElementById("modalConfirmar");
   if (modal) {
     modal.classList.remove("show");
     document.body.style.overflow = "auto";
   }
+  const btn = document.getElementById("modalBtnConfirmar");
+  if (btn) btn.classList.remove("loading");
 };
 
 window.confirmarInscripcion = async function () {
@@ -448,47 +491,45 @@ window.confirmarInscripcion = async function () {
 
   try {
     // 1. Inscribirse al evento
+    inscriptionController = new AbortController();
+    const signal = inscriptionController.signal;
     const inscripResponse = await fetch(`${API_BASE}/inscriptions`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         userId:  parseInt(userId),
         eventId: parseInt(eventId)
-      })
+      }),
+      signal
     });
 
     const inscripData = await readResponseData(inscripResponse);
 
     if (!inscripResponse.ok) {
+      inscriptionController = null;
       if (btn) btn.classList.remove("loading");
       window.cerrarModalConfirmacion();
       showToastError(inscripData.message || "Error al inscribirse. Quizás ya estás inscrito o no hay cupos.");
       return;
     }
-    
-    // 2. Disminuir los cupos disponibles en el event-service
-    try {
-      await fetch(`${API_BASE}/events/${eventId}/decrease-spots`, {
-        method: "PUT"
-      });
-    } catch(e) { console.error("Error al descontar cupos", e); }
-    
-    // 3. Mandar la notificación y correo (Notification Service)
-    try {
-      if (email) {
-        await fetch(`${API_BASE}/notifications`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userId: parseInt(userId),
-            email: email,
-            eventName: eventName,
-            message: `¡Hola! Te confirmamos que tu inscripcion al evento ${eventName} ha sido completada exitosamente. ¡Nos vemos alli!`
-          })
-        });
-      }
-    } catch(e) { console.error("Error al enviar notificación", e); }
 
+    // 2 + 3 en paralelo: descontar cupos + notificación/correo
+    await Promise.all([
+      fetch(`${API_BASE}/events/${eventId}/decrease-spots`, { method: "PUT", signal }).catch(() => {}),
+      email ? fetch(`${API_BASE}/notifications`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: parseInt(userId),
+          email: email,
+          eventName: eventName,
+          message: `¡Hola! Te confirmamos que tu inscripcion al evento ${eventName} ha sido completada exitosamente. ¡Nos vemos alli!`
+        }),
+        signal
+      }).catch(() => {}) : Promise.resolve()
+    ]);
+
+    inscriptionController = null;
     if (btn) btn.classList.remove("loading");
 
     // Éxito — poblar y mostrar modal de éxito local
@@ -519,7 +560,8 @@ window.confirmarInscripcion = async function () {
       }
     }
 
-  } catch {
+  } catch (err) {
+    if (err && err.name === "AbortError") return; // cancelado por el usuario
     if (btn) btn.classList.remove("loading");
     window.cerrarModalConfirmacion();
     showToastError("Fallo de conexión con el servidor.");
@@ -586,7 +628,6 @@ let userInscriptions = [];
 async function loadMyEvents() {
   const myEventsGrid    = document.getElementById("myEventsGrid");
   const myEventsMessage = document.getElementById("myEventsMessage");
-  const myEventsFilters = document.getElementById("myEventsFilters");
   if (!myEventsGrid || !myEventsMessage) return;
 
   const { userId } = getSession();
@@ -626,12 +667,16 @@ async function loadMyEvents() {
       return;
     }
 
-    userInscriptions = inscripciones;
-
-    if (myEventsFilters) {
-      myEventsFilters.style.display = "flex";
-      updateFilterCounts(userInscriptions);
-    }
+    // Obtener detalles de cada evento en paralelo
+    const eventIds = [...new Set(inscripciones.map(i => i.eventId))];
+    const eventMap = {};
+    await Promise.all(eventIds.map(async id => {
+      try {
+        const r = await fetch(`${API_BASE}/events/${id}`);
+        if (r.ok) eventMap[id] = await r.json();
+      } catch { /* ignorar si falla uno */ }
+    }));
+    userInscriptions = inscripciones.map(i => ({ ...i, event: eventMap[i.eventId] || null }));
 
     renderMyEvents(userInscriptions);
     myEventsGrid.style.display   = "grid";
@@ -680,7 +725,7 @@ function renderMyEvents(items) {
       || "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&auto=format&fit=crop";
     const evDate     = inscrip.event?.eventDate
       ? formatEventDate(inscrip.event.eventDate)
-      : formatEventDate(inscrip.registrationDate);
+      : formatEventDate(inscrip.inscriptionDate);
 
     return `
       <article class="event-card-v3" style="border:1px solid var(--color-border);">
@@ -708,14 +753,9 @@ window.filtrarMisEventos = function (status, btnElement) {
 // ============================================================
 //  PERFIL (perfil.html)
 // ============================================================
-const logoutBtn   = document.getElementById("logoutBtn");
 const profileForm = document.getElementById("profileForm");
 
 let userProfileId = null;
-
-if (logoutBtn) {
-  logoutBtn.addEventListener("click", logout);   // ← usa la función logout() centralizada
-}
 
 if (profileForm) {
   profileForm.addEventListener("submit", async (e) => {
@@ -755,6 +795,16 @@ if (profileForm) {
       if(response.ok) {
         const data = await readResponseData(response);
         userProfileId = data.id;
+        // Actualizar vista de solo lectura con los nuevos datos
+        const setView = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || "—"; };
+        setView("viewName",     document.getElementById("profName").value);
+        setView("viewLastName", document.getElementById("profLastName").value);
+        setView("viewPhone",    document.getElementById("profPhone").value);
+        setView("viewAddress",  document.getElementById("profAddress").value);
+        setView("viewGender",   document.getElementById("profGender").value);
+        setView("viewDob",      document.getElementById("profDob").value);
+        // Volver a vista de solo lectura
+        window.cancelarEdicion();
         alert("¡Perfil guardado correctamente!");
       } else {
         alert("Error al guardar perfil.");
@@ -780,18 +830,41 @@ async function prefillProfileForm() {
     if (response.ok) {
       const data = await readResponseData(response);
       userProfileId = data.id;
-      if (data.nombre) nameInput.value = data.nombre;
-      if (data.apellido) document.getElementById("profLastName").value = data.apellido;
-      if (data.telefono) document.getElementById("profPhone").value = data.telefono;
-      if (data.direccion) document.getElementById("profAddress").value = data.direccion;
-      if (data.genero) document.getElementById("profGender").value = data.genero;
-      if (data.fechaNacimiento) document.getElementById("profDob").value = data.fechaNacimiento;
-      if (data.fotoPerfil) document.getElementById("profAvatarUrl").value = data.fotoPerfil;
+      // Llenar inputs del formulario de edición
+      if (data.nombre)          nameInput.value = data.nombre;
+      if (data.apellido)        document.getElementById("profLastName").value  = data.apellido;
+      if (data.telefono)        document.getElementById("profPhone").value     = data.telefono;
+      if (data.direccion)       document.getElementById("profAddress").value   = data.direccion;
+      if (data.genero)          document.getElementById("profGender").value    = data.genero;
+      if (data.fechaNacimiento) document.getElementById("profDob").value       = data.fechaNacimiento;
+      if (data.fotoPerfil)      document.getElementById("profAvatarUrl").value = data.fotoPerfil;
+      // Llenar vista de sólo lectura
+      const setView = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || "—"; };
+      setView("viewName",     data.nombre);
+      setView("viewLastName", data.apellido);
+      setView("viewPhone",    data.telefono);
+      setView("viewAddress",  data.direccion);
+      setView("viewGender",   data.genero);
+      setView("viewDob",      data.fechaNacimiento);
     }
-  } catch(e) { 
+  } catch(e) {
     console.error("Error al obtener perfil", e);
   }
 }
+
+window.activarEdicion = function() {
+  const view = document.getElementById("profileView");
+  const form = document.getElementById("profileForm");
+  if (view) view.style.display = "none";
+  if (form) form.style.display = "";
+};
+
+window.cancelarEdicion = function() {
+  const view = document.getElementById("profileView");
+  const form = document.getElementById("profileForm");
+  if (form) form.style.display = "none";
+  if (view) view.style.display = "";
+};
 
 // ============================================================
 //  LANDING PAGE: EVENTOS DESTACADOS (index.html)

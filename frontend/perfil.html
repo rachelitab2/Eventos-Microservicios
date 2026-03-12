@@ -45,12 +45,13 @@
           </span>
         </a>
 
-       <div class="nav-actions" id="userNavActions">
-  <span style="color: var(--color-white); font-weight: 500; margin-right: 15px;">CarlosR</span>
-  <a href="auth.html" class="nav-login">Cerrar Sesión</a>
-</div>
-            <!-- La barra ahora en su versión minimalista arriba derecha (CarlosR | Cerrar Sesión) -->
-        </div>
+        <nav class="nav-links">
+          <a href="index.html">Inicio</a>
+          <a href="events.html">Eventos</a>
+          <a href="my-events.html">Mis Eventos</a>
+        </nav>
+
+        <div class="nav-actions" id="userNavActions"></div>
       </div>
     </div>
   </header>
@@ -76,13 +77,52 @@
         </div>
       </div>
 
-      <!-- Formulario de Perfil -->
-      <form class="profile-form" id="profileForm">
-        
+      <!-- Vista de datos (por defecto) -->
+      <div id="profileView">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nombre</label>
+            <p class="profile-view-value" id="viewName">—</p>
+          </div>
+          <div class="form-group">
+            <label>Apellido</label>
+            <p class="profile-view-value" id="viewLastName">—</p>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label>Teléfono</label>
+            <p class="profile-view-value" id="viewPhone">—</p>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label>Dirección</label>
+            <p class="profile-view-value" id="viewAddress">—</p>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Género</label>
+            <p class="profile-view-value" id="viewGender">—</p>
+          </div>
+          <div class="form-group">
+            <label>Fecha de nacimiento</label>
+            <p class="profile-view-value" id="viewDob">—</p>
+          </div>
+        </div>
+        <div class="submit-row">
+          <button type="button" class="profile-submit-btn" onclick="activarEdicion()">✏️ Editar</button>
+        </div>
+      </div>
+
+      <!-- Formulario de edición (oculto por defecto) -->
+      <form class="profile-form" id="profileForm" style="display:none">
+
         <div class="form-row">
           <div class="form-group">
             <label>nombre</label>
-            <input type="text" id="profName" placeholder="nombre" class="focused-input">
+            <input type="text" id="profName" placeholder="nombre">
           </div>
           <div class="form-group">
             <label>apellido</label>
@@ -128,7 +168,7 @@
 
         <div class="submit-row">
           <button type="submit" class="profile-submit-btn">Guardar Cambios</button>
-          <button type="button" class="profile-logout-btn" id="logoutBtn">Cerrar Sesión</button>
+          <button type="button" class="profile-logout-btn" onclick="cancelarEdicion()">Cancelar</button>
         </div>
 
       </form>
