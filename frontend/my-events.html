@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pura Vida PC | Mi Perfil</title>
+  <title>Pura Vida PC | Mis Eventos</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
-<body style="background-color: var(--color-light); overflow-x: hidden;">
+<body style="background-color: var(--color-cream); overflow-x: hidden;">
 
   <header class="site-header site-header-solid">
     <div class="container">
@@ -56,8 +56,7 @@
   </header>
 
   <main class="profile-page-container">
-
-    <div class="profile-card" style="max-width: 900px;">
+    <div class="profile-card my-events-shell" style="max-width: 1080px;">
       <div class="profile-palms-bg"></div>
 
       <div class="profile-avatar">
@@ -72,16 +71,30 @@
         </div>
       </div>
 
-      <h2 style="text-align:center; margin-bottom:10px; color:#333;">Mis Eventos</h2>
-      <p style="text-align:center; color:var(--color-muted); margin-bottom:20px;">Aquí puedes ver todos los eventos en los que te has inscrito.</p>
+      <div class="my-events-header">
+        <span class="my-events-kicker">Panel personal</span>
+        <h2>Mis Eventos</h2>
+        <p>Aqu&iacute; puedes ver todos los eventos en los que te has inscrito y revisar su estado en tiempo real.</p>
+      </div>
 
-      <!-- Grid de eventos inscritos -->
-      <div id="myEventsGrid" style="display:none; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px;"></div>
+      <div id="myEventsFilters" class="my-events-filters" style="display:none;">
+        <button class="my-filter-pill active" onclick="filtrarMisEventos('ALL', this)">
+          Todos <span id="cntAll">0</span>
+        </button>
+        <button class="my-filter-pill" onclick="filtrarMisEventos('CONFIRMED', this)">
+          Confirmados <span id="cntConfirmed">0</span>
+        </button>
+        <button class="my-filter-pill" onclick="filtrarMisEventos('PENDING', this)">
+          Pendientes <span id="cntPending">0</span>
+        </button>
+        <button class="my-filter-pill" onclick="filtrarMisEventos('CANCELLED', this)">
+          Cancelados <span id="cntCancelled">0</span>
+        </button>
+      </div>
 
-      <!-- Mensaje cuando no hay eventos o hay error -->
-      <div id="myEventsMessage" style="text-align:center; padding:30px; color:#888;"></div>
+      <div id="myEventsGrid" class="events-grid-v3" style="display:none;"></div>
+      <div id="myEventsMessage" class="my-events-message" style="text-align:center; padding:30px; color:#888;"></div>
     </div>
-
   </main>
 
   <div class="star-decoration">

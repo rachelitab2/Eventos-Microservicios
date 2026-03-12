@@ -1538,6 +1538,116 @@ button {
   position: relative;
 }
 
+.my-events-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.my-events-header {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  display: grid;
+  gap: 10px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.my-events-header h2 {
+  color: #2c3638;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+}
+
+.my-events-header p {
+  color: var(--color-muted);
+  font-size: 1rem;
+}
+
+.my-events-kicker {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  margin: 0 auto;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(75, 157, 169, 0.14);
+  color: var(--color-primary);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.my-events-filters {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.my-filter-pill {
+  border: 1px solid rgba(26, 77, 85, 0.12);
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--color-primary);
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.92rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.my-filter-pill span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: rgba(75, 157, 169, 0.12);
+  font-size: 0.82rem;
+}
+
+.my-filter-pill:hover,
+.my-filter-pill.active {
+  background: var(--color-primary);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 22px rgba(26, 77, 85, 0.18);
+}
+
+.my-filter-pill:hover span,
+.my-filter-pill.active span {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.my-events-message {
+  position: relative;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.56);
+  border: 1px dashed rgba(75, 157, 169, 0.35);
+  border-radius: 24px;
+}
+
+.v3-action-group {
+  margin-top: auto;
+  display: grid;
+  gap: 12px;
+}
+
+.my-events-link {
+  text-align: center;
+  width: 100%;
+}
+
 .profile-palms-bg {
   position: absolute;
   top: 0;
