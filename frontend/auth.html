@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pura Vida PC | Acceso</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="animations.css">
+</head>
+
+<body>
+  <main class="auth-page">
+    <section class="auth-shell">
+      <div class="auth-visual">
+        <div class="auth-brand">
+          <div class="auth-brand-mark">
+            <svg viewBox="0 0 70 70" aria-hidden="true">
+              <circle cx="35" cy="35" r="33" fill="#4B9DA9"></circle>
+              <circle cx="35" cy="35" r="30" fill="none" stroke="#91C6BC" stroke-width="0.8" opacity="0.5"></circle>
+              <g transform="translate(35, 35)">
+                <ellipse cx="0" cy="-15" rx="8" ry="14" fill="#E37434" opacity="0.95" transform="rotate(0)"></ellipse>
+                <ellipse cx="0" cy="-15" rx="8" ry="14" fill="#E37434" opacity="0.9" transform="rotate(72)"></ellipse>
+                <ellipse cx="0" cy="-15" rx="8" ry="14" fill="#E37434" opacity="0.9" transform="rotate(144)"></ellipse>
+                <ellipse cx="0" cy="-15" rx="8" ry="14" fill="#E37434" opacity="0.9" transform="rotate(216)"></ellipse>
+                <ellipse cx="0" cy="-15" rx="8" ry="14" fill="#E37434" opacity="0.9" transform="rotate(288)"></ellipse>
+                <ellipse cx="0" cy="-12" rx="5" ry="10" fill="#F6F3C2" opacity="0.35" transform="rotate(36)"></ellipse>
+                <ellipse cx="0" cy="-12" rx="5" ry="10" fill="#F6F3C2" opacity="0.35" transform="rotate(108)"></ellipse>
+                <ellipse cx="0" cy="-12" rx="5" ry="10" fill="#F6F3C2" opacity="0.35" transform="rotate(180)"></ellipse>
+                <ellipse cx="0" cy="-12" rx="5" ry="10" fill="#F6F3C2" opacity="0.35" transform="rotate(252)"></ellipse>
+                <ellipse cx="0" cy="-12" rx="5" ry="10" fill="#F6F3C2" opacity="0.35" transform="rotate(324)"></ellipse>
+                <circle cx="0" cy="0" r="7" fill="#F6F3C2"></circle>
+                <circle cx="0" cy="0" r="5" fill="#E37434"></circle>
+                <circle cx="0" cy="0" r="2.5" fill="#4B9DA9"></circle>
+              </g>
+            </svg>
+          </div>
+          <div>
+            <h1>Pura Vida PC</h1>
+            <p>Tu entrada a experiencias reales en Punta Cana.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-panel">
+        <div class="auth-toggle">
+          <button class="auth-toggle-btn is-active" type="button" id="showLogin">Login</button>
+          <button class="auth-toggle-btn" type="button" id="showRegister">Registro</button>
+        </div>
+
+        <div class="auth-form-block">
+          <div class="auth-message" id="authMessage"></div>
+
+          <div class="auth-form-panel" id="loginPanel">
+            <h2 class="auth-title">Iniciar sesion</h2>
+            <p class="auth-subtitle">
+              Entra para descubrir eventos, guardar tus planes y vivir la experiencia.
+            </p>
+            <form class="auth-form" id="loginForm">
+              <label class="auth-field">
+                <span>Email</span>
+                <input type="email" id="loginEmail" placeholder="correo@ejemplo.com">
+              </label>
+              <label class="auth-field">
+                <span>Password</span>
+                <input type="password" id="loginPassword" placeholder="Tu contrasena">
+              </label>
+              <button type="submit" class="btn auth-submit">Entrar</button>
+            </form>
+          </div>
+
+          <div class="auth-form-panel is-hidden" id="registerPanel">
+            <h2 class="auth-title">Crear cuenta</h2>
+            <p class="auth-subtitle">
+              Registrate para empezar a explorar actividades y experiencias en Punta Cana.
+            </p>
+            <form class="auth-form" id="registerForm">
+              <label class="auth-field">
+                <span>Username</span>
+                <input type="text" id="registerUsername" placeholder="Tu nombre de usuario">
+              </label>
+              <label class="auth-field">
+                <span>Email</span>
+                <input type="email" id="registerEmail" placeholder="correo@ejemplo.com">
+              </label>
+              <label class="auth-field">
+                <span>Password</span>
+                <input type="password" id="registerPassword" placeholder="Minimo 6 caracteres">
+              </label>
+              <button type="submit" class="btn auth-submit">Registrarme</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  <!-- app.js primero: registra los listeners de loginForm y registerForm -->
+  <script src="app.js"></script>
+  <script>
+    AOS.init({ once: true, easing: 'cubic-bezier(0.22,1,0.36,1)' });
+
+    // Ripple effect
+    document.querySelectorAll('.btn').forEach(btn => {
+      btn.addEventListener('click', function (e) {
+        const r = document.createElement('span');
+        r.className = 'btn-ripple';
+        const rect = this.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        r.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX - rect.left - size / 2}px;top:${e.clientY - rect.top - size / 2}px`;
+        this.appendChild(r);
+        setTimeout(() => r.remove(), 700);
+      });
+    });
+    // Guard: si ya hay sesión activa, no tiene sentido estar aquí
+    // (app.js ya redirige en DOMContentLoaded, esto es solo respaldo visual)
+  </script>
+</body>
+
+</html>

@@ -51,4 +51,20 @@ public class EventServiceImpl implements EventService {
                 .orElseThrow(() -> new EventNotFoundException(id));
         return eventMapper.toResponse(event);
     }
+
+    // Disminuye los cupos disponibles de un evento por ID
+    @Override
+    public EventResponse decreaseSpots(Long id) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new EventNotFoundException(id));
+        
+        if (event.getAvailableSpots() > 0) {
+            event.setAvailableSpots(event.getAvailableSpots() - 1);
+            event = eventRepository.save(event);
+        } else {
+            throw new IllegalStateException("No available spots for this event");
+        }
+        
+        return eventMapper.toResponse(event);
+    }
 }

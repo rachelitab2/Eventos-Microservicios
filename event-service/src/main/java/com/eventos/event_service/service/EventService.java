@@ -19,4 +19,7 @@ public interface EventService {
 
     // Obtiene el detalle de un evento por ID
     EventResponse getEventById(Long id);
+
+    // Disminuye los cupos disponibles de un evento por ID
+    EventResponse decreaseSpots(Long id);
 }

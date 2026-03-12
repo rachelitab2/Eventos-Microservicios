@@ -15,7 +15,6 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/events")
-@CrossOrigin(origins = "*")
 public class EventController {
 
     private final EventService eventService;
@@ -53,5 +52,19 @@ public class EventController {
     public ResponseEntity<EventResponse> getEventById(@PathVariable Long id) {
         EventResponse response = eventService.getEventById(id);
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * PUT /events/{id}/decrease-spots
+     * Disminuye un cupo del evento
+     */
+    @PutMapping("/{id}/decrease-spots")
+    public ResponseEntity<EventResponse> decreaseSpots(@PathVariable Long id) {
+        try {
+            EventResponse response = eventService.decreaseSpots(id);
+            return ResponseEntity.ok(response);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
     }
 }
