@@ -1,5 +1,9 @@
-// Allow local/frontend envs to target a different gateway without code edits.
-const API_BASE = (import.meta.env.VITE_API_BASE || "https://gateway-production-69b3.up.railway.app").replace(/\/$/, "");
+// Local dev should talk to the local gateway by default, while production keeps Railway.
+const defaultApiBase = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+  ? '/api'
+  : 'https://gateway-production-69b3.up.railway.app';
+
+const API_BASE = (import.meta.env.VITE_API_BASE || defaultApiBase).replace(/\/$/, "");
 
 // Helper for parsing JSON or Text responses
 export async function readResponse(response: Response) {
