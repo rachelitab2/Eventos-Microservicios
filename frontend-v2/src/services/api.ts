@@ -1,5 +1,5 @@
-// Base API Service for connecting to the Spring Boot Gateway
-const API_BASE = "https://gateway-production-69b3.up.railway.app";
+// Allow local/frontend envs to target a different gateway without code edits.
+const API_BASE = (import.meta.env.VITE_API_BASE || "https://gateway-production-69b3.up.railway.app").replace(/\/$/, "");
 
 // Helper for parsing JSON or Text responses
 export async function readResponse(response: Response) {
