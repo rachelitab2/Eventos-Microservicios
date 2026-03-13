@@ -42,6 +42,17 @@ async function readResponseData(response) {
   }
 }
 
+async function fetchWithTimeout(url, options = {}, timeoutMs = 8000) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
 // ── Mensaje en el formulario de auth ──
 const authMessage = document.getElementById("authMessage");
 
@@ -514,7 +525,37 @@ window.confirmarInscripcion = async function () {
     }
 
     // 2 + 3 en paralelo: descontar cupos + notificación/correo
-    await Promise.all([
+    let spotsUpdated = true;
+    try {
+      const spotsResponse = await fetch(`${API_BASE}/events/${eventId}/decrease-spots`, {
+        method: "PUT",
+        signal
+      });
+      spotsUpdated = spotsResponse.ok;
+    } catch {
+      spotsUpdated = false;
+    }
+
+    let notificationSent = false;
+    if (email) {
+      try {
+        const notificationResponse = await fetchWithTimeout(`${API_BASE}/notifications`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId: parseInt(userId),
+            email: email,
+            eventName: eventName,
+            message: `Â¡Hola! Te confirmamos que tu inscripcion al evento ${eventName} ha sido completada exitosamente. Â¡Nos vemos alli!`
+          })
+        }, 8000);
+        notificationSent = notificationResponse.ok;
+      } catch {
+        notificationSent = false;
+      }
+    }
+
+    if (false) await Promise.all([
       fetch(`${API_BASE}/events/${eventId}/decrease-spots`, { method: "PUT", signal }).catch(() => {}),
       email ? fetch(`${API_BASE}/notifications`, {
         method: "POST",
@@ -536,8 +577,25 @@ window.confirmarInscripcion = async function () {
     window.cerrarModalConfirmacion();
     const successNombre = document.getElementById("successNombreEvento");
     const successCorreo = document.getElementById("successCorreo");
+    const successEmailLabel = document.getElementById("successEmailLabel");
+    const successNotice = document.getElementById("successNotice");
     if (successNombre) successNombre.textContent = eventName;
     if (successCorreo) successCorreo.textContent = email || "tu correo";
+    if (successEmailLabel) {
+      successEmailLabel.textContent = notificationSent
+        ? "Correo enviado a"
+        : "Inscripcion confirmada. Correo pendiente para";
+    }
+    if (successNotice) {
+      const notices = [];
+      if (email && !notificationSent) {
+        notices.push("La notificacion se guardo, pero el correo no se confirmo a tiempo.");
+      }
+      if (!spotsUpdated) {
+        notices.push("El conteo de cupos puede tardar unos segundos en reflejarse.");
+      }
+      successNotice.textContent = notices.join(" ");
+    }
 
     const exitoModal = document.getElementById("modalExito");
     if (exitoModal) {
@@ -628,11 +686,13 @@ let userInscriptions = [];
 async function loadMyEvents() {
   const myEventsGrid    = document.getElementById("myEventsGrid");
   const myEventsMessage = document.getElementById("myEventsMessage");
+  const myEventsFilters = document.getElementById("myEventsFilters");
   if (!myEventsGrid || !myEventsMessage) return;
 
   const { userId } = getSession();
 
   if (!userId) {
+    if (myEventsFilters) myEventsFilters.style.display = "none";
     myEventsMessage.innerHTML = `
       <h3>Inicia sesión para ver tus eventos</h3>
       <p style="margin-top:10px;color:var(--color-muted);">
@@ -652,12 +712,16 @@ async function loadMyEvents() {
 
     if (!response.ok) {
       myEventsGrid.innerHTML = "";
+      myEventsGrid.style.display = "none";
+      if (myEventsFilters) myEventsFilters.style.display = "none";
       myEventsMessage.innerHTML = "<h3>No se encontraron inscripciones.</h3>";
       return;
     }
 
     if (!Array.isArray(inscripciones) || inscripciones.length === 0) {
       myEventsGrid.innerHTML = "";
+      myEventsGrid.style.display = "none";
+      if (myEventsFilters) myEventsFilters.style.display = "none";
       myEventsMessage.innerHTML = `
         <h3>🌴 Aún no tienes eventos inscritos.</h3>
         <a href="events.html" class="v3-btn" style="margin-top:15px;display:inline-block;">
@@ -673,17 +737,25 @@ async function loadMyEvents() {
     await Promise.all(eventIds.map(async id => {
       try {
         const r = await fetch(`${API_BASE}/events/${id}`);
-        if (r.ok) eventMap[id] = await r.json();
+        if (!r.ok) return;
+        const eventData = await readResponseData(r);
+        if (eventData && !eventData.message) {
+          eventMap[id] = eventData;
+        }
       } catch { /* ignorar si falla uno */ }
     }));
     userInscriptions = inscripciones.map(i => ({ ...i, event: eventMap[i.eventId] || null }));
 
+    updateFilterCounts(userInscriptions);
     renderMyEvents(userInscriptions);
+    if (myEventsFilters) myEventsFilters.style.display = "flex";
     myEventsGrid.style.display   = "grid";
     myEventsMessage.style.display = "none";
 
   } catch {
     myEventsGrid.innerHTML = "";
+    myEventsGrid.style.display = "none";
+    if (myEventsFilters) myEventsFilters.style.display = "none";
     myEventsMessage.innerHTML = "<h3>Error de conexión. ¿Está encendido el servidor?</h3>";
   }
 }
@@ -737,7 +809,10 @@ function renderMyEvents(items) {
           <h3 class="v3-title">${evName}</h3>
           <p class="v3-meta">📅 ${evDate}</p>
           <p class="v3-meta">📍 ${evLocation}</p>
-          <div class="v3-action">${getStatusBadge(inscrip.status)}</div>
+          <div class="v3-action-group">
+            <div class="v3-action">${getStatusBadge(inscrip.status)}</div>
+            ${inscrip.event ? `<a href="event-detail.html?id=${inscrip.event.id}" class="v3-btn my-events-link">Ver detalle</a>` : ""}
+          </div>
         </div>
       </article>
     `;

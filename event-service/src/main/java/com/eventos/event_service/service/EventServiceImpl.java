@@ -67,4 +67,20 @@ public class EventServiceImpl implements EventService {
         
         return eventMapper.toResponse(event);
     }
+
+    @Override
+    public EventResponse increaseSpots(Long id) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new EventNotFoundException(id));
+
+        int totalCapacity = event.getTotalCapacity() == null ? Integer.MAX_VALUE : event.getTotalCapacity();
+        int availableSpots = event.getAvailableSpots() == null ? 0 : event.getAvailableSpots();
+
+        if (availableSpots < totalCapacity) {
+            event.setAvailableSpots(availableSpots + 1);
+            event = eventRepository.save(event);
+        }
+
+        return eventMapper.toResponse(event);
+    }
 }

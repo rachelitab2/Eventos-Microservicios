@@ -21,6 +21,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class InscriptionService {
 
+    private static final String CANCELLED_STATUS = "CANCELLED";
+
     private final InscriptionRepository inscriptionRepository;
     private final InscriptionMapper inscriptionMapper;
 
@@ -30,7 +32,7 @@ public class InscriptionService {
     @Transactional
     public InscriptionResponse createInscription(InscriptionRequest request) {
         
-        if (inscriptionRepository.existsByUserIdAndEventId(request.getUserId(), request.getEventId())) {
+        if (inscriptionRepository.existsByUserIdAndEventIdAndStatusNot(request.getUserId(), request.getEventId(), CANCELLED_STATUS)) {
             throw new InscriptionException("El usuario ya está inscrito en este evento");
         }
 
@@ -45,8 +47,44 @@ public class InscriptionService {
      */
     @Transactional(readOnly = true)
     public List<InscriptionResponse> getUserInscriptions(Long userId) {
-        return inscriptionRepository.findByUserId(userId).stream()
+        return inscriptionRepository.findByUserIdAndStatusNot(userId, CANCELLED_STATUS).stream()
                 .map(inscriptionMapper::toResponse)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Eliminar una inscripcion por su ID.
+     */
+    @Transactional
+    public void deleteInscription(Long inscriptionId) {
+        Inscription inscription = inscriptionRepository.findById(inscriptionId)
+                .orElseThrow(() -> new InscriptionException("La inscripcion no existe"));
+
+        if (CANCELLED_STATUS.equalsIgnoreCase(inscription.getStatus())) {
+            return;
+        }
+
+        if (inscription.getId() == null) {
+            throw new InscriptionException("La inscripcion no existe");
+        }
+
+        inscription.setStatus(CANCELLED_STATUS);
+        inscriptionRepository.save(inscription);
+    }
+
+    /**
+     * Contar cuantas inscripciones existen en un evento.
+     */
+    @Transactional(readOnly = true)
+    public long countByEvent(Long eventId) {
+        return inscriptionRepository.countByEventIdAndStatusNot(eventId, CANCELLED_STATUS);
+    }
+
+    /**
+     * Verificar si un usuario ya esta inscrito en un evento.
+     */
+    @Transactional(readOnly = true)
+    public boolean isUserInscribed(Long userId, Long eventId) {
+        return inscriptionRepository.existsByUserIdAndEventIdAndStatusNot(userId, eventId, CANCELLED_STATUS);
     }
 }

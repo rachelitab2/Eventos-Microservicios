@@ -22,4 +22,7 @@ public interface EventService {
 
     // Disminuye los cupos disponibles de un evento por ID
     EventResponse decreaseSpots(Long id);
+
+    // Aumenta los cupos disponibles de un evento por ID
+    EventResponse increaseSpots(Long id);
 }

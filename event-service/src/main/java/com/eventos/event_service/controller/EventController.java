@@ -67,4 +67,14 @@ public class EventController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
+
+    /**
+     * PUT /events/{id}/increase-spots
+     * Restaura un cupo disponible del evento
+     */
+    @PutMapping("/{id}/increase-spots")
+    public ResponseEntity<EventResponse> increaseSpots(@PathVariable Long id) {
+        EventResponse response = eventService.increaseSpots(id);
+        return ResponseEntity.ok(response);
+    }
 }
