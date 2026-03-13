@@ -14,9 +14,11 @@ public interface InscriptionRepository extends JpaRepository<Inscription, Long> 
 
     // Propósito: Recuperar todas las inscripciones asociadas a un usuario específico.
     // Spring Data JPA genera la consulta SQL automáticamente basándose en el nombre del método.
-    List<Inscription> findByUserId(Long userId);
+    List<Inscription> findByUserIdAndStatusNot(Long userId, String status);
 
     // Propósito: Verificar si un usuario ya existe en un evento determinado.
     // Es clave para cumplir la regla de negocio de "Evitar Duplicados".
-    boolean existsByUserIdAndEventId(Long userId, Long eventId);
+    boolean existsByUserIdAndEventIdAndStatusNot(Long userId, Long eventId, String status);
+
+    long countByEventIdAndStatusNot(Long eventId, String status);
 }

@@ -1,0 +1,17 @@
+target/
+*.jar
+.mvn/
+mvnw
+mvnw.cmd
+.git/
+.gitignore
+*.md
+auth_logs.txt
+gateway_logs.txt
+inscrip_logs.txt
+auth_full.log
+up_help.txt
+mysql_vars.txt
+node_modules/
+.dockerignore
+infra/

@@ -45,4 +45,33 @@ public class InscriptionController {
         // Retorna la lista encontrada con un estatus 200 OK.
         return ResponseEntity.ok(inscriptionService.getUserInscriptions(userId));
     }
+
+    /**
+     * Endpoint: Eliminar una inscripcion por ID
+     * Proposito: Permite cancelar una reservacion desde "Mis Eventos".
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        inscriptionService.deleteInscription(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Endpoint: Contar inscripciones asociadas a un evento.
+     */
+    @GetMapping("/event/{eventId}/count")
+    public ResponseEntity<Long> countByEvent(@PathVariable Long eventId) {
+        return ResponseEntity.ok(inscriptionService.countByEvent(eventId));
+    }
+
+    /**
+     * Endpoint: Verificar si un usuario ya esta inscrito en un evento.
+     */
+    @GetMapping("/check")
+    public ResponseEntity<Boolean> checkUserInscription(
+            @RequestParam Long userId,
+            @RequestParam Long eventId
+    ) {
+        return ResponseEntity.ok(inscriptionService.isUserInscribed(userId, eventId));
+    }
 }
