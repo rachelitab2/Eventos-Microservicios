@@ -11,7 +11,7 @@ interface UserSession {
 interface AuthContextType {
   session: UserSession | null;
   isLoading: boolean;
-  login: (data: UserSession) => void;
+  login: (data: UserSession, token?: string) => void;
   logout: () => void;
 }
 
