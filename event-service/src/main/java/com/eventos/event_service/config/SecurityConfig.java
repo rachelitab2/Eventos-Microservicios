@@ -33,11 +33,13 @@ public class SecurityConfig {
             "http://localhost:5174",
             "http://localhost:5175",
             "http://localhost:5176",
-            "http://localhost:8080"
+            "http://localhost:8080",
+            "https://frontend-production-5e8b.up.railway.app"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setAllowCredentials(true);
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
+        configuration.setAllowCredentials(false);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

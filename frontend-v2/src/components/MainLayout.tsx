@@ -172,13 +172,15 @@ export function MainLayout() {
                         minWidth: '200px', overflow: 'hidden', zIndex: 100,
                       }}
                     >
-                      <Link to="/profile" onClick={() => setDropdownOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.85rem 1.25rem', textDecoration: 'none', color: 'var(--color-text-dark)', fontSize: '0.95rem', transition: 'background 0.15s' }}
-                        onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'rgba(18,60,68,0.04)')}
-                        onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'transparent')}
-                      >
-                        <User size={16} /> Mi Perfil
-                      </Link>
-                      <div style={{ borderTop: '1px solid #F3F4F6' }}>
+                      {session?.role !== 'ADMIN' && (
+                        <Link to="/profile" onClick={() => setDropdownOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.85rem 1.25rem', textDecoration: 'none', color: 'var(--color-text-dark)', fontSize: '0.95rem', transition: 'background 0.15s' }}
+                          onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'rgba(18,60,68,0.04)')}
+                          onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'transparent')}
+                        >
+                          <User size={16} /> Mi Perfil
+                        </Link>
+                      )}
+                      <div style={{ borderTop: session?.role !== 'ADMIN' ? '1px solid #F3F4F6' : 'none' }}>
                         <button onClick={handleLogout} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.85rem 1.25rem', width: '100%', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', color: '#EF4444', fontSize: '0.95rem', fontWeight: 500, transition: 'background 0.15s' }}
                           onMouseEnter={e => (e.currentTarget.style.background = 'rgba(239,68,68,0.05)')}
                           onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}

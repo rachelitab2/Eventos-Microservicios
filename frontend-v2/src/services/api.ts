@@ -7,9 +7,6 @@ const defaultApiBase = isLocal ? '/api' : productionApiBase;
 
 const API_BASE = (import.meta.env.VITE_API_BASE || defaultApiBase).replace(/\/$/, "");
 
-// Only use credentials in local mode (CORS wildcard not allowed with credentials in production)
-const fetchOptions = isLocal ? { credentials: 'include' as const } : {};
-
 // Helper to get JWT token from localStorage
 function getToken(): string | null {
   return localStorage.getItem('authToken');
@@ -28,18 +25,17 @@ export async function readResponse(response: Response) {
 
 class ApiService {
   public async get<T>(path: string): Promise<T> {
-    const res = await fetch(`${API_BASE}${path}`, fetchOptions);
+    const res = await fetch(`${API_BASE}${path}`);
     const data = await readResponse(res);
     if (!res.ok) throw new Error(data.message || 'Error en request GET');
     return data as T;
   }
 
-  public async post<T>(path: string, body: unknown): Promise<T> {
+  public async post<T>(path: string, body: unknown, customHeaders?: Record<string, string>): Promise<T> {
     const res = await fetch(`${API_BASE}${path}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-      ...fetchOptions
+      headers: { "Content-Type": "application/json", ...customHeaders },
+      body: JSON.stringify(body)
     });
     const data = await readResponse(res);
     if (!res.ok) throw new Error(data.message || 'Error en request POST');

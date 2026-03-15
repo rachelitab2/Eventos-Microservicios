@@ -10,14 +10,14 @@
 #  Base de datos →  Railway MySQL (público)
 # ============================================================
 
-$ROOT = Split-Path $PSScriptRoot -Parent
+$ROOT = $PSScriptRoot
 
 function Write-Step  { param($msg) Write-Host "`n[>>] $msg" -ForegroundColor Cyan }
 function Write-Ok    { param($msg) Write-Host "    [OK] $msg" -ForegroundColor Green }
 function Write-Warn  { param($msg) Write-Host "    [!!] $msg" -ForegroundColor Yellow }
 function Write-Fail  { param($msg) Write-Host "    [ERROR] $msg" -ForegroundColor Red; exit 1 }
 
-$ROOT = Split-Path $PSScriptRoot -Parent
+$ROOT = $PSScriptRoot
 
 # ─────────────────────────────────────────────────────────────────────────────
 #  1. VERIFICAR PREREQS
@@ -47,7 +47,7 @@ if (-not $nodeCheck) {
 if (-not $skipFrontend) {
     Write-Step "Preparando Frontend v2..."
 
-    $frontendDir = "$ROOT\frontend-v2"
+    $frontendDir = "$PSScriptRoot\frontend-v2"
 
     if (-not (Test-Path "$frontendDir\node_modules")) {
         Write-Warn "node_modules no encontrado. Ejecutando npm install..."

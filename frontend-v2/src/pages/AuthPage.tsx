@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Lock, User, ArrowRight, Eye, EyeOff, CheckCircle, XCircle } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, Eye, EyeOff, CheckCircle, XCircle, Shield } from 'lucide-react';
 import { Button } from '../components/Button';
 import { useToast } from '../components/ToastContext';
 import { useAuth } from '../hooks/useAuth';
@@ -132,6 +132,8 @@ export function AuthPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [adminSecret, setAdminSecret] = useState('');
   const [touched, setTouched] = useState({ email: false, password: false, username: false });
 
   const errors = {
@@ -149,6 +151,7 @@ export function AuthPage() {
     setIsLogin(p => !p);
     setTouched({ email: false, password: false, username: false });
     setEmail(''); setPassword(''); setUsername('');
+    setIsAdmin(false); setAdminSecret('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -163,9 +166,18 @@ export function AuthPage() {
         login({ userId: res.userId, username: res.username, email: res.email, role: res.role }, res.token);
         showToast('¡Bienvenido de vuelta!', 'success');
         navigate('/events');
+      } else if (isAdmin) {
+        const res = await api.post<{ userId: string; username: string; email: string; token: string; role: string }>(
+          '/auth/register-admin',
+          { username, email, password },
+          { 'X-Admin-Secret': adminSecret }
+        );
+        showToast('¡Cuenta admin creada!', 'success');
+        login({ userId: res.userId, username: res.username, email: res.email, role: res.role }, res.token);
+        navigate('/events');
       } else {
         const res = await api.post<{ userId: string; username: string; email: string; token: string; role: string }>('/auth/register', { username, email, password });
-        showToast('¡Cuenta creada! Bienvenido 🎉', 'success');
+        showToast('¡Cuenta creada! Bienvenido', 'success');
         login({ userId: res.userId, username: res.username, email: res.email, role: res.role }, res.token);
         navigate('/events');
       }
@@ -259,13 +271,41 @@ export function AuthPage() {
                 {!isLogin && <PasswordStrength pass={password} />}
               </div>
 
+              <AnimatePresence>
+                {!isLogin && isAdmin && (
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.25 }}>
+                    <FormField
+                      label="Secreto de administrador" value={adminSecret} onChange={v => setAdminSecret(v)}
+                      placeholder="Ingresa el secreto de admin" icon={Shield}
+                      hint="Proporcionado por el administrador del sistema"
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               <Button
                 type="submit" variant="primary" size="lg" isLoading={loading}
                 style={{ width: '100%', marginTop: '0.5rem', opacity: (!isFormValid && (touched.email || touched.password)) ? 0.7 : 1, transition: 'opacity 0.2s' }}
                 rightIcon={<ArrowRight size={18} />}
               >
-                {isLogin ? 'Ingresar' : 'Crear Cuenta'}
+                {isLogin ? 'Ingresar' : isAdmin ? 'Registrar Admin' : 'Crear Cuenta'}
               </Button>
+
+              {!isLogin && (
+                <div style={{ textAlign: 'center', marginTop: '0.25rem' }}>
+                  <button
+                    type="button"
+                    onClick={() => setIsAdmin(prev => !prev)}
+                    style={{
+                      background: 'none', border: 'none', cursor: 'pointer',
+                      color: 'var(--color-secondary)', fontWeight: 600,
+                      fontSize: '0.85rem',
+                    }}
+                  >
+                    {isAdmin ? 'Volver a registro normal' : '¿Eres administrador? Regístrate como admin'}
+                  </button>
+                </div>
+              )}
 
             </form>
           </div>
