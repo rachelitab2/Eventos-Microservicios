@@ -5,6 +5,7 @@ import { Button } from '../components/Button';
 import { EventCard } from '../components/EventCard';
 import { useEffect, useState, useRef } from 'react';
 import { api } from '../services/api';
+import { useAuth } from '../hooks/useAuth';
 
 /* ──────────────────────────────────────────────────────
    SLIDES del carrusel hero
@@ -72,6 +73,7 @@ const STATS = [
 export function HomePage() {
   const [current, setCurrent]   = useState(0);
   const [direction, setDirection] = useState(1); // 1 = forward, -1 = backward
+  const { session } = useAuth();
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const [featuredEvents, setFeaturedEvents] = useState<unknown[]>([]);
@@ -219,16 +221,18 @@ export function HomePage() {
                     Explorar Eventos
                   </Button>
                 </Link>
-                <Link to="/auth">
-                  <button style={{
-                    padding: '0.82rem 1.9rem', borderRadius: '99px',
-                    border: '2px solid rgba(255,255,255,0.45)',
-                    background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)',
-                    color: 'white', fontWeight: 600, fontSize: '1rem', cursor: 'pointer',
-                  }}>
-                    Crear cuenta gratis
-                  </button>
-                </Link>
+                {!session ? (
+                  <Link to="/auth">
+                    <button style={{
+                      padding: '0.82rem 1.9rem', borderRadius: '99px',
+                      border: '2px solid rgba(255,255,255,0.45)',
+                      background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)',
+                      color: 'white', fontWeight: 600, fontSize: '1rem', cursor: 'pointer',
+                    }}>
+                      Crear cuenta gratis
+                    </button>
+                  </Link>
+                ) : null}
               </div>
             </motion.div>
           </AnimatePresence>
@@ -423,7 +427,7 @@ export function HomePage() {
               </span>
             </h2>
             <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '1.15rem', margin: '0 auto 2.5rem', maxWidth: '520px' }}>
-              Únete a miles de viajeros que ya descubren Punta Cana con Pura Vida PC.
+              Únete a miles de personas que viven la experiencia Punta Cana con Pura Vida PC.
             </p>
             {/* Stats row */}
             <div style={{ display: 'flex', justifyContent: 'center', gap: '2.5rem', marginBottom: '2.5rem', flexWrap: 'wrap' }}>
@@ -434,7 +438,7 @@ export function HomePage() {
                 </div>
               ))}
             </div>
-            <Link to="/auth" className="btn-shimmer" style={{ display: 'inline-block' }}>
+            <Link to={session ? "/events" : "/auth"} className="btn-shimmer" style={{ display: 'inline-block' }}>
               <Button size="lg" variant="secondary" rightIcon={<ArrowRight size={20} />}>
                 Empezar gratis ahora
               </Button>

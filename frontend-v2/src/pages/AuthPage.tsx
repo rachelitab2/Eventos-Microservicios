@@ -159,15 +159,15 @@ export function AuthPage() {
 
     try {
       if (isLogin) {
-        const res = await api.post<{ userId: string; username: string; email: string }>('/auth/login', { email, password });
-        login({ userId: res.userId, username: res.username, email: res.email });
+        const res = await api.post<{ userId: string; username: string; email: string; token: string; role: string }>('/auth/login', { email, password });
+        login({ userId: res.userId, username: res.username, email: res.email, role: res.role }, res.token);
         showToast('¡Bienvenido de vuelta!', 'success');
-        navigate('/');
+        navigate('/events');
       } else {
-        const res = await api.post<{ userId: string; username: string; email: string }>('/auth/register', { username, email, password });
+        const res = await api.post<{ userId: string; username: string; email: string; token: string; role: string }>('/auth/register', { username, email, password });
         showToast('¡Cuenta creada! Bienvenido 🎉', 'success');
-        login({ userId: res.userId, username: res.username, email: res.email });
-        navigate('/');
+        login({ userId: res.userId, username: res.username, email: res.email, role: res.role }, res.token);
+        navigate('/events');
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Error inesperado';

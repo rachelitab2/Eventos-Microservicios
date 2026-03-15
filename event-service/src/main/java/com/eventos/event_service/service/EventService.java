@@ -25,4 +25,10 @@ public interface EventService {
 
     // Aumenta los cupos disponibles de un evento por ID
     EventResponse increaseSpots(Long id);
+
+    // Actualiza un evento existente
+    EventResponse updateEvent(Long id, EventRequest request);
+
+    // Elimina un evento (soft delete - marca como inactivo)
+    void deleteEvent(Long id);
 }

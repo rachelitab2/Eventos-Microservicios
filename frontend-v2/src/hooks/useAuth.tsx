@@ -5,6 +5,7 @@ interface UserSession {
   userId: string | number;
   username: string;
   email: string;
+  role: string;
 }
 
 interface AuthContextType {
@@ -25,21 +26,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const uid = localStorage.getItem('authUserId');
     const uname = localStorage.getItem('username');
     const uemail = localStorage.getItem('email');
-    
-    if (uid && uname && uemail) {
+    const urole = localStorage.getItem('authRole');
+
+    if (uid && uname && uemail && urole) {
       setSession({
         userId: uid,
         username: uname,
-        email: uemail
+        email: uemail,
+        role: urole
       });
     }
     setIsLoading(false);
   }, []);
 
-  const login = (data: UserSession) => {
+  const login = (data: UserSession, token?: string) => {
     localStorage.setItem('authUserId', String(data.userId));
     localStorage.setItem('username', data.username);
     localStorage.setItem('email', data.email);
+    localStorage.setItem('authRole', data.role);
+    if (token) {
+      localStorage.setItem('authToken', token);
+    }
     setSession(data);
   };
 
@@ -47,6 +54,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('authUserId');
     localStorage.removeItem('username');
     localStorage.removeItem('email');
+    localStorage.removeItem('authRole');
+    localStorage.removeItem('authToken');
     setSession(null);
   };
 

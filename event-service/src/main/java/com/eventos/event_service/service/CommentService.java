@@ -7,18 +7,21 @@ import com.eventos.event_service.entity.Event;
 import com.eventos.event_service.exception.EventNotFoundException;
 import com.eventos.event_service.repository.CommentRepository;
 import com.eventos.event_service.repository.EventRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class CommentService {
 
     private final CommentRepository commentRepository;
     private final EventRepository eventRepository;
+
+    public CommentService(CommentRepository commentRepository, EventRepository eventRepository) {
+        this.commentRepository = commentRepository;
+        this.eventRepository = eventRepository;
+    }
 
     @Transactional(readOnly = true)
     public List<CommentResponse> getCommentsByEvent(Long eventId) {

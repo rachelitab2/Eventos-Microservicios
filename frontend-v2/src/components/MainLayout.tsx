@@ -57,22 +57,37 @@ export function MainLayout() {
         >
 
           {/* LOGO */}
-          <Link
-            to="/"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              textDecoration: 'none',
-              justifySelf: 'start',
-              transform: 'translateY(7px)'
-            }}
-          >
-            <PuraVidaLogo variant="light" size="sm" animated={true} />
-          </Link>
+          {session?.role === 'ADMIN' ? (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                textDecoration: 'none',
+                justifySelf: 'start',
+                transform: 'translateY(7px)',
+                cursor: 'default'
+              }}
+            >
+              <PuraVidaLogo variant="light" size="sm" animated={true} />
+            </div>
+          ) : (
+            <Link
+              to="/"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                textDecoration: 'none',
+                justifySelf: 'start',
+                transform: 'translateY(7px)'
+              }}
+            >
+              <PuraVidaLogo variant="light" size="sm" animated={true} />
+            </Link>
+          )}
 
           {/* NAV LINKS */}
           <nav style={{ display: 'flex', gap: '0.25rem', alignItems: 'center', justifySelf: 'center' }}>
-            {navLinks.map(link => {
+            {session?.role !== 'ADMIN' && navLinks.map(link => {
               const isActive = location.pathname === link.path;
               return (
                 <Link
@@ -115,15 +130,6 @@ export function MainLayout() {
           <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', position: 'relative', justifySelf: 'end' }}>
             {session ? (
               <>
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => navigate('/my-events')}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)', padding: '0.5rem', borderRadius: '50%', display: 'flex' }}
-                >
-                  <Bell size={20} />
-                </motion.button>
-
                 <button
                   onClick={() => setDropdownOpen(!dropdownOpen)}
                   style={{

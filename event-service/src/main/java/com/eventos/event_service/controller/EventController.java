@@ -77,4 +77,24 @@ public class EventController {
         EventResponse response = eventService.increaseSpots(id);
         return ResponseEntity.ok(response);
     }
+
+    /**
+     * PUT /events/{id}
+     * Actualiza un evento existente (requiere rol ADMIN)
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<EventResponse> updateEvent(@PathVariable Long id, @RequestBody EventRequest request) {
+        EventResponse response = eventService.updateEvent(id, request);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * DELETE /events/{id}
+     * Elimina un evento (requiere rol ADMIN)
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteEvent(@PathVariable Long id) {
+        eventService.deleteEvent(id);
+        return ResponseEntity.noContent().build();
+    }
 }

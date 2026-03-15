@@ -83,4 +83,40 @@ public class EventServiceImpl implements EventService {
 
         return eventMapper.toResponse(event);
     }
+
+    // Actualiza un evento existente con nuevos datos
+    @Override
+    public EventResponse updateEvent(Long id, EventRequest request) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new EventNotFoundException(id));
+
+        // Actualiza todos los campos del evento
+        event.setName(request.getName());
+        event.setDescription(request.getDescription());
+        event.setLocation(request.getLocation());
+        event.setEventDate(request.getEventDate());
+        event.setTotalCapacity(request.getTotalCapacity());
+        event.setCategory(request.getCategory());
+        event.setPrice(request.getPrice());
+        event.setImageUrl(request.getImageUrl());
+        event.setInstagramUrl(request.getInstagramUrl());
+        event.setInstagramUser(request.getInstagramUser());
+        event.setFacebookUrl(request.getFacebookUrl());
+        event.setFacebookUser(request.getFacebookUser());
+        event.setWhatsappNumber(request.getWhatsappNumber());
+        event.setTiktokUrl(request.getTiktokUrl());
+        event.setTiktokUser(request.getTiktokUser());
+
+        Event updatedEvent = eventRepository.save(event);
+        return eventMapper.toResponse(updatedEvent);
+    }
+
+    // Elimina un evento marcándolo como inactivo (soft delete)
+    @Override
+    public void deleteEvent(Long id) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new EventNotFoundException(id));
+        event.setActive(false);
+        eventRepository.save(event);
+    }
 }

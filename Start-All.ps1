@@ -10,14 +10,14 @@
 #  Base de datos →  Railway MySQL (público)
 # ============================================================
 
-$ROOT = $PSScriptRoot
+$ROOT = Split-Path $PSScriptRoot -Parent
 
 function Write-Step  { param($msg) Write-Host "`n[>>] $msg" -ForegroundColor Cyan }
 function Write-Ok    { param($msg) Write-Host "    [OK] $msg" -ForegroundColor Green }
 function Write-Warn  { param($msg) Write-Host "    [!!] $msg" -ForegroundColor Yellow }
 function Write-Fail  { param($msg) Write-Host "    [ERROR] $msg" -ForegroundColor Red; exit 1 }
 
-$ROOT = $PSScriptRoot
+$ROOT = Split-Path $PSScriptRoot -Parent
 
 # ─────────────────────────────────────────────────────────────────────────────
 #  1. VERIFICAR PREREQS
