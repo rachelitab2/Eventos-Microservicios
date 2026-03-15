@@ -1,8 +1,11 @@
 // API base:
 // - Local (localhost): uses /api (Vite proxies to services)
-// - Production: uses Railway gateway URL
+// - Production: uses environment variable VITE_API_BASE or Railway gateway URL
 const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-const productionApiBase = 'https://gateway-production-69b3.up.railway.app';
+
+// For production, try to use Railway's internal service URL if available
+// Otherwise fallback to public gateway URL
+const productionApiBase = import.meta.env.VITE_GATEWAY_URL || 'https://gateway-production-69b3.up.railway.app';
 const defaultApiBase = isLocal ? '/api' : productionApiBase;
 
 const API_BASE = (import.meta.env.VITE_API_BASE || defaultApiBase).replace(/\/$/, "");
