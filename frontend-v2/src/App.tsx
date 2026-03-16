@@ -7,7 +7,7 @@ import { EventsPage } from './pages/EventsPage';
 import { EventDetailPage } from './pages/EventDetailPage';
 import { MyEventsPage } from './pages/MyEventsPage';
 import { ProfilePage } from './pages/ProfilePage';
-import { AdminPanel } from './pages/AdminPanel';
+import { AdminPage } from './pages/AdminPage';
 import { useAuth } from './hooks/useAuth';
 
 function AppRoutes() {
@@ -17,13 +17,13 @@ function AppRoutes() {
   return (
     <Routes>
       <Route element={<MainLayout />}>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/auth" element={<AuthPage />} />
-        <Route path="/events" element={isAdmin ? <AdminPanel /> : <EventsPage />} />
+        <Route path="/" element={isAdmin ? <Navigate to="/admin" replace /> : <HomePage />} />
+        <Route path="/auth" element={session ? <Navigate to={isAdmin ? '/admin' : '/events'} replace /> : <AuthPage />} />
+        <Route path="/events" element={<EventsPage />} />
         <Route path="/events/:id" element={<EventDetailPage />} />
         <Route path="/my-events" element={<MyEventsPage />} />
         <Route path="/profile" element={<ProfilePage />} />
-        {isAdmin && <Route path="/admin" element={<AdminPanel />} />}
+        <Route path="/admin" element={isAdmin ? <AdminPage /> : <Navigate to="/" replace />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>

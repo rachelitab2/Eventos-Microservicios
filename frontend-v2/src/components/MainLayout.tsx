@@ -2,7 +2,7 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { User, LogOut, ChevronDown } from 'lucide-react';
+import { User, LogOut, ChevronDown, Shield } from 'lucide-react';
 import { PuraVidaLogo } from './PuraVidaLogo';
 
 export function MainLayout() {
@@ -87,6 +87,29 @@ export function MainLayout() {
 
           {/* NAV LINKS */}
           <nav style={{ display: 'flex', gap: '0.25rem', alignItems: 'center', justifySelf: 'center' }}>
+            {session?.role === 'ADMIN' && (
+              <Link
+                to="/admin"
+                style={{
+                  padding: '0.5rem 1.1rem',
+                  borderRadius: '2rem',
+                  fontWeight: location.pathname === '/admin' ? 700 : 500,
+                  fontSize: '0.95rem',
+                  color: location.pathname === '/admin' ? 'var(--color-primary)' : 'var(--color-text-muted)',
+                  background: location.pathname === '/admin'
+                    ? 'linear-gradient(135deg, rgba(18,60,68,0.1), rgba(108,164,169,0.08))'
+                    : 'transparent',
+                  textDecoration: 'none',
+                  transition: 'all 0.2s ease',
+                  boxShadow: location.pathname === '/admin' ? 'inset 0 0 0 1px rgba(18,60,68,0.12)' : 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                }}
+              >
+                <Shield size={16} /> Panel Admin
+              </Link>
+            )}
             {session?.role !== 'ADMIN' && navLinks.map(link => {
               const isActive = location.pathname === link.path;
               return (
