@@ -8,6 +8,17 @@ export interface ServiceStatus {
   httpStatus: number;
   error?: string;
   lastChecked: string;
+  disabled?: boolean;
+}
+
+export interface EventSubscriber {
+  id: number;
+  userId: number;
+  eventId: number;
+  inscriptionDate: string;
+  status: string;
+  userName?: string;
+  userEmail?: string;
 }
 
 export interface AdminSummary {

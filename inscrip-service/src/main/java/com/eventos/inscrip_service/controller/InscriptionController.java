@@ -57,6 +57,14 @@ public class InscriptionController {
     }
 
     /**
+     * Endpoint: Obtener inscripciones de un evento.
+     */
+    @GetMapping("/event/{eventId}")
+    public ResponseEntity<List<InscriptionResponse>> getByEvent(@PathVariable Long eventId) {
+        return ResponseEntity.ok(inscriptionService.getEventInscriptions(eventId));
+    }
+
+    /**
      * Endpoint: Contar inscripciones asociadas a un evento.
      */
     @GetMapping("/event/{eventId}/count")

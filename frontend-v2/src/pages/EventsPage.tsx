@@ -5,6 +5,8 @@ import { EventCard } from '../components/EventCard';
 import { Modal } from '../components/Modal';
 import { api } from '../services/api';
 import { useToast } from '../components/ToastContext';
+import { useServiceStatus } from '../components/ServiceStatusContext';
+import { ServiceUnavailable } from '../components/ServiceUnavailable';
 
 interface Event {
   id: string | number;
@@ -64,6 +66,7 @@ export function EventsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('all');
+  const { isServiceDown } = useServiceStatus();
 
   // Admin controls
   const isAdmin = localStorage.getItem('authRole') === 'ADMIN';
@@ -185,6 +188,14 @@ export function EventsPage() {
       setSubmitting(false);
     }
   };
+
+  if (isServiceDown('event-service')) {
+    return (
+      <div className="page-wrapper container" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>
+        <ServiceUnavailable serviceName="Eventos" message="El servicio de eventos se encuentra temporalmente fuera de servicio. Por favor, contacta con el administrador." />
+      </div>
+    );
+  }
 
   return (
     <div className="page-wrapper container" style={{ paddingBottom: '4rem' }}>

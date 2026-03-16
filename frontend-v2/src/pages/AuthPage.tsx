@@ -7,6 +7,8 @@ import { useAuth } from '../hooks/useAuth';
 import { api } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import { PuraVidaLogo } from '../components/PuraVidaLogo';
+import { useServiceStatus } from '../components/ServiceStatusContext';
+import { ServiceUnavailable } from '../components/ServiceUnavailable';
 
 /* ── Field validation helpers ── */
 const validators = {
@@ -128,6 +130,7 @@ export function AuthPage() {
   const { showToast } = useToast();
   const { login } = useAuth();
   const navigate = useNavigate();
+  const { isServiceDown } = useServiceStatus();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -192,6 +195,14 @@ export function AuthPage() {
       setLoading(false);
     }
   };
+
+  if (isServiceDown('auth-service')) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <ServiceUnavailable serviceName="Autenticación" message="El servicio de autenticación se encuentra temporalmente fuera de servicio. Por favor, contacta con el administrador." />
+      </div>
+    );
+  }
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex' }}>

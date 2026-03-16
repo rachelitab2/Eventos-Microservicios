@@ -31,4 +31,10 @@ public interface EventService {
 
     // Elimina un evento (soft delete - marca como inactivo)
     void deleteEvent(Long id);
+
+    // Lista TODOS los eventos (activos e inactivos) - solo para admin
+    List<EventResponse> getAllEventsAdmin();
+
+    // Alterna el estado activo/inactivo de un evento
+    EventResponse toggleEventActive(Long id);
 }

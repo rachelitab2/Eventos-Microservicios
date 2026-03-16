@@ -81,6 +81,16 @@ public class InscriptionService {
     }
 
     /**
+     * Obtener todas las inscripciones de un evento.
+     */
+    @Transactional(readOnly = true)
+    public List<InscriptionResponse> getEventInscriptions(Long eventId) {
+        return inscriptionRepository.findByEventIdAndStatusNot(eventId, CANCELLED_STATUS).stream()
+                .map(inscriptionMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Verificar si un usuario ya esta inscrito en un evento.
      */
     @Transactional(readOnly = true)

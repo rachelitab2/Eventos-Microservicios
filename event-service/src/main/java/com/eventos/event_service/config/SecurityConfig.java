@@ -37,6 +37,9 @@ public class SecurityConfig {
                 .requestMatchers("/events/*/comments/**").permitAll()
                 // Public: health
                 .requestMatchers("/health").permitAll()
+                // Admin only: admin-specific endpoints
+                .requestMatchers(HttpMethod.GET, "/events/admin/all").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/events/*/toggle-active").hasRole("ADMIN")
                 // Admin only: CRUD writes
                 .requestMatchers(HttpMethod.POST, "/events").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/events/*").hasRole("ADMIN")

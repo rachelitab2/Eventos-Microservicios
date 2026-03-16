@@ -79,6 +79,24 @@ public class EventController {
     }
 
     /**
+     * GET /events/admin/all
+     * Lista todos los eventos incluyendo inactivos (requiere rol ADMIN)
+     */
+    @GetMapping("/admin/all")
+    public ResponseEntity<List<EventResponse>> getAllEventsAdmin() {
+        return ResponseEntity.ok(eventService.getAllEventsAdmin());
+    }
+
+    /**
+     * PUT /events/{id}/toggle-active
+     * Alterna activo/inactivo de un evento (requiere rol ADMIN)
+     */
+    @PutMapping("/{id}/toggle-active")
+    public ResponseEntity<EventResponse> toggleEventActive(@PathVariable Long id) {
+        return ResponseEntity.ok(eventService.toggleEventActive(id));
+    }
+
+    /**
      * PUT /events/{id}
      * Actualiza un evento existente (requiere rol ADMIN)
      */

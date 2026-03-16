@@ -9,6 +9,7 @@ import { MyEventsPage } from './pages/MyEventsPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { AdminPage } from './pages/AdminPage';
 import { useAuth } from './hooks/useAuth';
+import { ServiceStatusProvider } from './components/ServiceStatusContext';
 
 function AppRoutes() {
   const { session } = useAuth();
@@ -33,9 +34,11 @@ function AppRoutes() {
 function App() {
   return (
     <BrowserRouter>
-      <AnimatePresence mode="wait">
-        <AppRoutes />
-      </AnimatePresence>
+      <ServiceStatusProvider>
+        <AnimatePresence mode="wait">
+          <AppRoutes />
+        </AnimatePresence>
+      </ServiceStatusProvider>
     </BrowserRouter>
   );
 }

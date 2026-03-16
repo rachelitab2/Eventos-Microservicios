@@ -15,11 +15,15 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @RestController
 @RequestMapping("/admin/api")
 public class AdminController {
+
+    // Tracks which services are "disabled" by admin for testing
+    private final Set<String> disabledServices = ConcurrentHashMap.newKeySet();
 
     @Value("${jwt.secret}")
     private String jwtSecret;
@@ -95,12 +99,13 @@ public class AdminController {
         result.put("name", svc.name());
         result.put("url", svc.url());
         result.put("port", svc.port());
+        result.put("disabled", disabledServices.contains(svc.key()));
 
         long start = System.currentTimeMillis();
         try {
             ResponseEntity<String> resp = restTemplate.getForEntity(svc.url() + "/health", String.class);
             long latency = System.currentTimeMillis() - start;
-            result.put("status", resp.getStatusCode().is2xxSuccessful() ? "healthy" : "degraded");
+            result.put("status", disabledServices.contains(svc.key()) ? "down" : (resp.getStatusCode().is2xxSuccessful() ? "healthy" : "degraded"));
             result.put("latency", latency);
             result.put("httpStatus", resp.getStatusCode().value());
             result.put("lastChecked", Instant.now().toString());
@@ -207,9 +212,9 @@ public class AdminController {
             HttpHeaders headers = new HttpHeaders();
             if (token != null) headers.set("Authorization", token);
             HttpEntity<Void> entity = new HttpEntity<>(headers);
-            // Fetch all events including inactive via the event service
+            // Fetch ALL events (active + inactive) via the admin endpoint
             ResponseEntity<String> resp = restTemplate.exchange(
-                    eventServiceUrl + "/events", HttpMethod.GET, entity, String.class);
+                    eventServiceUrl + "/events/admin/all", HttpMethod.GET, entity, String.class);
             audit("event-service", "GET", "/admin/api/events", resp.getStatusCode().value(), "Admin fetched events list");
             return ResponseEntity.status(resp.getStatusCode()).body(resp.getBody());
         } catch (Exception e) {
@@ -258,24 +263,109 @@ public class AdminController {
         }
     }
 
-    // PUT /admin/api/events/{id}/toggle-active — soft toggle active
+    // PUT /admin/api/events/{id}/toggle-active — toggle active/inactive
     @PutMapping("/events/{id}/toggle-active")
     public ResponseEntity<?> toggleEventActive(@PathVariable Long id, HttpServletRequest request) {
         requireAdmin(request);
         String token = request.getHeader("Authorization");
-        // Toggle = delete (soft delete sets active=false in event-service)
         try {
             HttpHeaders headers = new HttpHeaders();
             if (token != null) headers.set("Authorization", token);
             HttpEntity<Void> entity = new HttpEntity<>(headers);
             ResponseEntity<String> resp = restTemplate.exchange(
-                    eventServiceUrl + "/events/" + id, HttpMethod.DELETE, entity, String.class);
+                    eventServiceUrl + "/events/" + id + "/toggle-active", HttpMethod.PUT, entity, String.class);
             audit("event-service", "PUT", "/admin/api/events/" + id + "/toggle-active", resp.getStatusCode().value(), "Admin toggled event #" + id);
-            return ResponseEntity.ok(Map.of("message", "Evento #" + id + " desactivado", "id", id));
+            return ResponseEntity.status(resp.getStatusCode()).body(resp.getBody());
         } catch (Exception e) {
             audit("event-service", "PUT", "/admin/api/events/" + id + "/toggle-active", 500, "Error: " + e.getMessage());
             return ResponseEntity.status(500).body(Map.of("error", "Error al cambiar estado: " + e.getMessage()));
         }
+    }
+
+    // GET /admin/api/events/{eventId}/subscribers — get subscribers for an event
+    @GetMapping("/events/{eventId}/subscribers")
+    public ResponseEntity<?> getEventSubscribers(@PathVariable Long eventId, HttpServletRequest request) {
+        requireAdmin(request);
+        try {
+            // Get inscriptions from inscrip-service
+            ResponseEntity<String> inscResp = restTemplate.getForEntity(
+                    inscripServiceUrl + "/inscriptions/event/" + eventId, String.class);
+            audit("inscrip-service", "GET", "/admin/api/events/" + eventId + "/subscribers",
+                    inscResp.getStatusCode().value(), "Admin fetched subscribers for event #" + eventId);
+
+            // Try to enrich with user data from user-service
+            try {
+                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                List<Map<String, Object>> inscriptions = mapper.readValue(inscResp.getBody(),
+                        mapper.getTypeFactory().constructCollectionType(List.class, Map.class));
+
+                List<Map<String, Object>> enriched = new ArrayList<>();
+                for (Map<String, Object> insc : inscriptions) {
+                    Map<String, Object> entry = new LinkedHashMap<>(insc);
+                    Object userIdObj = insc.get("userId");
+                    if (userIdObj != null) {
+                        try {
+                            ResponseEntity<String> userResp = restTemplate.getForEntity(
+                                    userServiceUrl + "/users/auth/" + userIdObj, String.class);
+                            Map<String, Object> userData = mapper.readValue(userResp.getBody(), Map.class);
+                            entry.put("userName", userData.getOrDefault("nombre", "") + " " + userData.getOrDefault("apellido", ""));
+                            entry.put("userEmail", "");
+                        } catch (Exception ignored) {
+                            entry.put("userName", "Usuario #" + userIdObj);
+                            entry.put("userEmail", "");
+                        }
+                    }
+                    enriched.add(entry);
+                }
+                return ResponseEntity.ok(enriched);
+            } catch (Exception e) {
+                // If enrichment fails, return raw inscriptions
+                return ResponseEntity.status(inscResp.getStatusCode()).body(inscResp.getBody());
+            }
+        } catch (Exception e) {
+            audit("inscrip-service", "GET", "/admin/api/events/" + eventId + "/subscribers", 500, "Error: " + e.getMessage());
+            return ResponseEntity.status(500).body(Map.of("error", "Error al obtener suscriptores: " + e.getMessage()));
+        }
+    }
+
+    // POST /admin/api/services/{serviceKey}/toggle — enable/disable a service for testing
+    @PostMapping("/services/{serviceKey}/toggle")
+    public ResponseEntity<?> toggleService(@PathVariable String serviceKey, HttpServletRequest request) {
+        requireAdmin(request);
+        ServiceInfo svc = getServices().stream()
+                .filter(s -> s.key().equals(serviceKey))
+                .findFirst()
+                .orElse(null);
+        if (svc == null) {
+            return ResponseEntity.status(404).body(Map.of("error", "Servicio no encontrado: " + serviceKey));
+        }
+        boolean wasDisabled = disabledServices.contains(serviceKey);
+        if (wasDisabled) {
+            disabledServices.remove(serviceKey);
+        } else {
+            disabledServices.add(serviceKey);
+        }
+        String action = wasDisabled ? "habilitado" : "deshabilitado";
+        audit(serviceKey, "POST", "/admin/api/services/" + serviceKey + "/toggle", 200,
+                "Admin " + action + " " + svc.name());
+        return ResponseEntity.ok(Map.of(
+                "serviceKey", serviceKey,
+                "name", svc.name(),
+                "disabled", !wasDisabled,
+                "message", svc.name() + " " + action + " para pruebas"
+        ));
+    }
+
+    // GET /admin/api/services/disabled — get list of disabled services
+    @GetMapping("/services/disabled")
+    public ResponseEntity<?> getDisabledServices(HttpServletRequest request) {
+        requireAdmin(request);
+        return ResponseEntity.ok(disabledServices);
+    }
+
+    // Public access to disabled services set (used by HealthController)
+    public Set<String> getDisabledServicesSet() {
+        return disabledServices;
     }
 
     // Exception handler for security errors

@@ -6,6 +6,8 @@ import { Button } from '../components/Button';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../components/ToastContext';
 import { api } from '../services/api';
+import { useServiceStatus } from '../components/ServiceStatusContext';
+import { ServiceUnavailable } from '../components/ServiceUnavailable';
 
 interface Inscription {
   id: number;
@@ -50,6 +52,7 @@ export function MyEventsPage() {
   const { session } = useAuth();
   const navigate    = useNavigate();
   const { showToast } = useToast();
+  const { isServiceDown } = useServiceStatus();
 
   const [reservations, setReservations] = useState<ReservationCard[]>([]);
   const [loading, setLoading] = useState(true);
@@ -119,6 +122,14 @@ export function MyEventsPage() {
       </span>
     );
   };
+
+  if (isServiceDown('inscrip-service')) {
+    return (
+      <div className="page-wrapper container" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>
+        <ServiceUnavailable serviceName="Inscripciones" message="El servicio de inscripciones se encuentra temporalmente fuera de servicio. Por favor, contacta con el administrador." />
+      </div>
+    );
+  }
 
   return (
     <div className="page-wrapper container" style={{ paddingBottom: '4rem' }}>

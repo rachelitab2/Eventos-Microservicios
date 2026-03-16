@@ -9,6 +9,8 @@ import { Button } from '../components/Button';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../components/ToastContext';
 import { api } from '../services/api';
+import { useServiceStatus } from '../components/ServiceStatusContext';
+import { ServiceUnavailable } from '../components/ServiceUnavailable';
 
 interface EventDetail {
   id: number;
@@ -108,6 +110,7 @@ export function EventDetailPage() {
   const navigate = useNavigate();
   const { session } = useAuth();
   const { showToast } = useToast();
+  const { isServiceDown } = useServiceStatus();
 
   const [event, setEvent]           = useState<EventDetail | null>(null);
   const [loading, setLoading]       = useState(true);
@@ -212,6 +215,12 @@ export function EventDetailPage() {
       setDeletingCommentId(null);
     }
   };
+
+  if (isServiceDown('event-service')) return (
+    <div className="page-wrapper container" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>
+      <ServiceUnavailable serviceName="Eventos" message="El servicio de eventos se encuentra temporalmente fuera de servicio. Por favor, contacta con el administrador." />
+    </div>
+  );
 
   if (loading || !event) return (
     <div className="page-wrapper" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>

@@ -5,7 +5,8 @@ import {
   RefreshCw, Activity, Wifi, WifiOff, Clock,
   Plus, Pencil, Trash2, Search, ChevronDown,
   AlertTriangle, CheckCircle, XCircle, Loader2,
-  MapPin, Users, DollarSign, Eye, EyeOff
+  MapPin, Users, DollarSign, Eye, EyeOff,
+  Power, PowerOff, UserCheck
 } from 'lucide-react';
 import { api } from '../services/api';
 import { useToast } from '../components/ToastContext';
@@ -13,7 +14,7 @@ import { useAuth } from '../hooks/useAuth';
 import { EventForm } from '../components/EventForm';
 import { Modal } from '../components/Modal';
 import type { EventFormData } from '../components/EventForm';
-import type { AdminSummary, ServiceStatus, AuditEntry, AdminEvent } from '../types/admin';
+import type { AdminSummary, ServiceStatus, AuditEntry, AdminEvent, EventSubscriber } from '../types/admin';
 
 type TabKey = 'summary' | 'services' | 'audit' | 'events';
 
@@ -210,6 +211,16 @@ function ServicesSection() {
     }
   };
 
+  const toggleService = async (key: string, _name: string) => {
+    try {
+      const res = await api.authPost<{ disabled: boolean; message: string }>(`/admin/api/services/${key}/toggle`, {});
+      showToast(res.message, res.disabled ? 'error' : 'success');
+      await fetchAll();
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Error', 'error');
+    }
+  };
+
   if (loading) return <LoadingState message="Consultando microservicios..." />;
 
   return (
@@ -278,6 +289,23 @@ function ServicesSection() {
                 }}
               >
                 <RefreshCw size={13} /> Restart
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => toggleService(svc.key, svc.name)}
+                style={{
+                  padding: '0.45rem 0.9rem', borderRadius: '0.625rem',
+                  border: `1px solid ${svc.disabled ? 'rgba(5,150,105,0.3)' : 'rgba(220,38,38,0.3)'}`,
+                  background: svc.disabled ? 'rgba(5,150,105,0.05)' : 'rgba(220,38,38,0.05)',
+                  cursor: 'pointer', fontSize: '0.82rem', fontWeight: 600,
+                  color: svc.disabled ? '#059669' : '#DC2626',
+                  display: 'flex', alignItems: 'center', gap: '0.3rem',
+                }}
+                title={svc.disabled ? 'Habilitar servicio' : 'Deshabilitar servicio (pruebas)'}
+              >
+                {svc.disabled ? <Power size={13} /> : <PowerOff size={13} />}
+                {svc.disabled ? 'Activar' : 'Apagar'}
               </motion.button>
             </div>
           </motion.div>
@@ -416,6 +444,10 @@ function EventsSection() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletingEvent, setDeletingEvent] = useState<AdminEvent | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [showSubscribers, setShowSubscribers] = useState(false);
+  const [subscribersEvent, setSubscribersEvent] = useState<AdminEvent | null>(null);
+  const [subscribers, setSubscribers] = useState<EventSubscriber[]>([]);
+  const [loadingSubs, setLoadingSubs] = useState(false);
   const { showToast } = useToast();
 
   const fetchEvents = useCallback(async () => {
@@ -464,7 +496,7 @@ function EventsSection() {
   const handleToggleActive = async (ev: AdminEvent) => {
     try {
       await api.authPut(`/admin/api/events/${ev.id}/toggle-active`);
-      showToast(`Evento "${ev.name}" desactivado`, 'success');
+      showToast(`Evento "${ev.name}" ${ev.active ? 'desactivado' : 'activado'}`, 'success');
       await fetchEvents();
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Error', 'error');
@@ -472,6 +504,21 @@ function EventsSection() {
   };
 
   const handleFormSaved = async () => { setShowForm(false); setEditingEvent(undefined); await fetchEvents(); };
+
+  const handleViewSubscribers = async (ev: AdminEvent) => {
+    setSubscribersEvent(ev);
+    setShowSubscribers(true);
+    setLoadingSubs(true);
+    try {
+      const res = await api.authGet<EventSubscriber[]>(`/admin/api/events/${ev.id}/subscribers`);
+      setSubscribers(res);
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Error al cargar suscriptores', 'error');
+      setSubscribers([]);
+    } finally {
+      setLoadingSubs(false);
+    }
+  };
 
   const filtered = events.filter(ev => !searchTerm || ev.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
@@ -571,6 +618,9 @@ function EventsSection() {
 
                 {/* Actions */}
                 <div style={{ display: 'flex', gap: '0.4rem' }}>
+                  <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={() => handleViewSubscribers(ev)} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem', padding: '0.5rem', borderRadius: '0.5rem', border: '1px solid #DBEAFE', background: '#EFF6FF', cursor: 'pointer', fontWeight: 600, fontSize: '0.8rem', color: '#2563EB' }}>
+                    <UserCheck size={13} /> Inscritos
+                  </motion.button>
                   <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={() => handleEdit(ev)} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem', padding: '0.5rem', borderRadius: '0.5rem', border: '1px solid #E5E7EB', background: 'white', cursor: 'pointer', fontWeight: 600, fontSize: '0.8rem', color: 'var(--color-primary)' }}>
                     <Pencil size={13} /> Editar
                   </motion.button>
@@ -608,6 +658,71 @@ function EventsSection() {
           <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
             <button onClick={() => setShowDeleteModal(false)} disabled={submitting} style={{ padding: '0.65rem 1.25rem', borderRadius: '0.625rem', border: '1px solid #E5E7EB', background: 'white', cursor: 'pointer', fontWeight: 600 }}>Cancelar</button>
             <button onClick={handleConfirmDelete} disabled={submitting} style={{ padding: '0.65rem 1.25rem', borderRadius: '0.625rem', border: 'none', background: '#EF4444', color: 'white', cursor: 'pointer', fontWeight: 600 }}>{submitting ? 'Eliminando...' : 'Eliminar'}</button>
+          </div>
+        </Modal>
+      )}
+
+      {/* Subscribers Modal */}
+      {showSubscribers && subscribersEvent && (
+        <Modal isOpen={showSubscribers} onClose={() => { setShowSubscribers(false); setSubscribersEvent(null); setSubscribers([]); }} size="md">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
+            <div style={{ width: 40, height: 40, borderRadius: '0.75rem', background: '#EFF6FF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <UserCheck size={20} color="#2563EB" />
+            </div>
+            <div>
+              <h2 style={{ fontSize: '1.2rem', fontWeight: 700 }}>Inscritos en "{subscribersEvent.name}"</h2>
+              <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)' }}>
+                {subscribersEvent.totalCapacity - subscribersEvent.availableSpots} inscritos de {subscribersEvent.totalCapacity} cupos
+              </p>
+            </div>
+          </div>
+
+          {loadingSubs ? (
+            <LoadingState message="Cargando inscritos..." />
+          ) : subscribers.length === 0 ? (
+            <EmptyState icon={<Users size={28} />} title="Sin inscritos" description="Nadie se ha inscrito a este evento aún." />
+          ) : (
+            <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.88rem' }}>
+                <thead>
+                  <tr style={{ borderBottom: '2px solid #E5E7EB' }}>
+                    <th style={{ textAlign: 'left', padding: '0.6rem 0.75rem', fontWeight: 700, color: 'var(--color-text-muted)', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>#</th>
+                    <th style={{ textAlign: 'left', padding: '0.6rem 0.75rem', fontWeight: 700, color: 'var(--color-text-muted)', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Usuario</th>
+                    <th style={{ textAlign: 'left', padding: '0.6rem 0.75rem', fontWeight: 700, color: 'var(--color-text-muted)', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Fecha Inscripción</th>
+                    <th style={{ textAlign: 'left', padding: '0.6rem 0.75rem', fontWeight: 700, color: 'var(--color-text-muted)', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {subscribers.map((sub, i) => (
+                    <tr key={sub.id} style={{ borderBottom: '1px solid #F3F4F6' }}>
+                      <td style={{ padding: '0.65rem 0.75rem', color: 'var(--color-text-muted)' }}>{i + 1}</td>
+                      <td style={{ padding: '0.65rem 0.75rem' }}>
+                        <div>
+                          <span style={{ fontWeight: 600 }}>{sub.userName || `Usuario #${sub.userId}`}</span>
+                          <span style={{ display: 'block', fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>ID: {sub.userId}</span>
+                        </div>
+                      </td>
+                      <td style={{ padding: '0.65rem 0.75rem', color: 'var(--color-text-muted)' }}>
+                        {new Date(sub.inscriptionDate).toLocaleDateString('es-DO', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      </td>
+                      <td style={{ padding: '0.65rem 0.75rem' }}>
+                        <span style={{
+                          padding: '0.2rem 0.6rem', borderRadius: '99px', fontSize: '0.73rem', fontWeight: 600,
+                          background: sub.status === 'CONFIRMED' ? '#ECFDF5' : '#FEF2F2',
+                          color: sub.status === 'CONFIRMED' ? '#059669' : '#DC2626',
+                        }}>
+                          {sub.status === 'CONFIRMED' ? 'Confirmado' : sub.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1.25rem' }}>
+            <button onClick={() => { setShowSubscribers(false); setSubscribersEvent(null); setSubscribers([]); }} style={{ padding: '0.65rem 1.5rem', borderRadius: '0.625rem', border: '1px solid #E5E7EB', background: 'white', cursor: 'pointer', fontWeight: 600 }}>Cerrar</button>
           </div>
         </Modal>
       )}

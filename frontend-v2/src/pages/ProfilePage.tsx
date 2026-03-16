@@ -5,11 +5,14 @@ import { useAuth } from '../hooks/useAuth';
 import { Button } from '../components/Button';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../components/ToastContext';
+import { useServiceStatus } from '../components/ServiceStatusContext';
+import { ServiceUnavailable } from '../components/ServiceUnavailable';
 
 export function ProfilePage() {
   const { session, logout } = useAuth();
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const { isServiceDown } = useServiceStatus();
 
   useEffect(() => {
     if (!session) {
@@ -24,6 +27,14 @@ export function ProfilePage() {
   };
 
   if (!session) return null;
+
+  if (isServiceDown('user-service')) {
+    return (
+      <div className="page-wrapper container" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>
+        <ServiceUnavailable serviceName="Usuarios" message="El servicio de usuarios se encuentra temporalmente fuera de servicio. Por favor, contacta con el administrador." />
+      </div>
+    );
+  }
 
   return (
     <div className="page-wrapper container" style={{ paddingBottom: '4rem', display: 'flex', justifyContent: 'center' }}>

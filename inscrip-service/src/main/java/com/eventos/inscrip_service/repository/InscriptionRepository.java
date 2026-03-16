@@ -21,4 +21,6 @@ public interface InscriptionRepository extends JpaRepository<Inscription, Long> 
     boolean existsByUserIdAndEventIdAndStatusNot(Long userId, Long eventId, String status);
 
     long countByEventIdAndStatusNot(Long eventId, String status);
+
+    List<Inscription> findByEventIdAndStatusNot(Long eventId, String status);
 }

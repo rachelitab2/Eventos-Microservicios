@@ -119,4 +119,23 @@ public class EventServiceImpl implements EventService {
         event.setActive(false);
         eventRepository.save(event);
     }
+
+    // Lista TODOS los eventos (activos e inactivos) - solo para admin
+    @Override
+    public List<EventResponse> getAllEventsAdmin() {
+        return eventRepository.findAll()
+                .stream()
+                .map(eventMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    // Alterna el estado activo/inactivo de un evento
+    @Override
+    public EventResponse toggleEventActive(Long id) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new EventNotFoundException(id));
+        event.setActive(!event.isActive());
+        Event saved = eventRepository.save(event);
+        return eventMapper.toResponse(saved);
+    }
 }

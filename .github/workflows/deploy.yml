@@ -3,7 +3,7 @@ name: Deploy to Railway
 on:
   push:
     branches:
-      - develop
+      - main
 
 jobs:
   deploy:
@@ -18,36 +18,43 @@ jobs:
         run: bash <(curl -fsSL https://raw.githubusercontent.com/railwayapp/cli/master/install.sh)
 
       - name: Deploy gateway
+        working-directory: gateway
         run: railway up --service gateway --detach
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
       - name: Deploy auth-service
+        working-directory: auth-service
         run: railway up --service auth-service --detach
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
       - name: Deploy user-service
+        working-directory: user-service
         run: railway up --service user-service --detach
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
       - name: Deploy event-service
+        working-directory: event-service
         run: railway up --service event-service --detach
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
       - name: Deploy inscrip-service
+        working-directory: inscrip-service
         run: railway up --service inscrip-service --detach
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
       - name: Deploy notification-service
+        working-directory: notification-service
         run: railway up --service notification-service --detach
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
       - name: Deploy frontend
+        working-directory: frontend-v2
         run: railway up --service frontend --detach
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
