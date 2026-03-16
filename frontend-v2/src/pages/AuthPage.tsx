@@ -165,7 +165,7 @@ export function AuthPage() {
         const res = await api.post<{ userId: string; username: string; email: string; token: string; role: string }>('/auth/login', { email, password });
         login({ userId: res.userId, username: res.username, email: res.email, role: res.role }, res.token);
         showToast('¡Bienvenido de vuelta!', 'success');
-        navigate('/events');
+        navigate(res.role === 'ADMIN' ? '/admin' : '/events');
       } else if (isAdmin) {
         const res = await api.post<{ userId: string; username: string; email: string; token: string; role: string }>(
           '/auth/register-admin',
@@ -174,7 +174,7 @@ export function AuthPage() {
         );
         showToast('¡Cuenta admin creada!', 'success');
         login({ userId: res.userId, username: res.username, email: res.email, role: res.role }, res.token);
-        navigate('/events');
+        navigate('/admin');
       } else {
         const res = await api.post<{ userId: string; username: string; email: string; token: string; role: string }>('/auth/register', { username, email, password });
         showToast('¡Cuenta creada! Bienvenido', 'success');
